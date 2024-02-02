@@ -46,65 +46,64 @@ def ReadingFile():
 
 
 def CreateFiles(ReadingFile):
-    l = 2
-    x = 1
-    f = open (l,"w")
-    with f as outputfile:
-        w = csv.writer(outputfile, delimiter = " ")
-        FragmentCharge = 0
-        FragmentMultiplicity = 1
-        LigandCharge = 0
-        LigandMultiplicity = 1
-        TotalCharge = FragmentCharge + LigandCharge
-        if LigandMultiplicity > FragmentMultiplicity:
-            TotalMultiplicity = LigandMultiplicity
-        else:
-            TotalMultiplicity = FragmentMultiplicity
-
-    def BaseHeader():
-        w.writerow(["%chk="+ l+ ".chk"])
-        w.writerow(["%mem="+ Mem+ "GB"])
-        w.writerow(["nprocshared="+ Cores])
-        w.writerow(["#", Functional, " ", BasisSet, "SCRF=Solvent=", Solvent+ ")", " ", OtherInput])
-        w.writerow([" "])
-        w.writerow(["Title Card Required"])
-        w.writerow([" "])
+	def BaseHeader():
+		w.writerow(["%chk="+ l+ ".chk"])
+		w.writerow(["%mem="+ Mem+ "GB"])
+		w.writerow(["nprocshared="+ Cores])
+		w.writerow(["#", Functional, " ", BasisSet, "SCRF=Solvent=", Solvent+ ")", " ", OtherInput])
+		w.writerow([" "])	
+		w.writerow(["Title"+ "Card"+ "Required"])
+		w.writerow([" "])
     
-    def MainHeader():
-        w.writerow([BaseHeader()])
-        w.writerow([TotalCharge+ TotalMultiplicity])
+	def MainHeader():	
+		w.writerow([BaseHeader()])
+		w.writerow([TotalCharge+ TotalMultiplicity])
 
 
-    def LigandHeader():
-        w.writerow([BaseHeader()])
-        w.writerow([LigandCharge+ LigandMultiplicity])
+	def LigandHeader():
+		w.writerow([BaseHeader()])
+		w.writerow([LigandCharge+ LigandMultiplicity])
 
 
-    def FragmentHeader():
-        w.writerow([BaseHeader()])
-        w.writerow([FragmentCharge+ FragmentMultiplicity])
-    
-    while l < k+2:
-        w.writerow([MainHeader()])
-        w.writerow([Ligand])
-        w.writerow([AllCombos[x]])
-        w.writerow([" "])
-        w.writerow(["--Link1--"])
+	def FragmentHeader():
+		w.writerow([BaseHeader()])
+		w.writerow([FragmentCharge+ FragmentMultiplicity])
+ 
+	l = 2
+	x = 1
+	f = open (l,"w")
+	with f as outputfile:
+		w = csv.writer(outputfile, delimiter = " ")
+		FragmentCharge = 0
+		FragmentMultiplicity = 1
+		LigandCharge = 0
+		LigandMultiplicity = 1
+		TotalCharge = FragmentCharge + LigandCharge
+	if LigandMultiplicity > FragmentMultiplicity:
+		TotalMultiplicity = LigandMultiplicity
+	else:
+		TotalMultiplicity = FragmentMultiplicity
+
+	w.writerow([MainHeader()])
+	w.writerow([Ligand])
+	w.writerow([AllCombos[x]])
+	w.writerow([" "])
+	w.writerow(["--Link1--"])
                 #Need to make Ligand Bq
                 #Will need to change header charge
-        w.writerow([FragmentHeader()])
-        w.writerow([Ligand()])
-        w.writerow([AllCombos[x]])
-        w.writerow([" "])
-        w.writerow(["--Link1--"])
+	w.writerow([FragmentHeader()])
+	w.writerow([Ligand()])
+	w.writerow([AllCombos[x]])
+	w.writerow([" "])
+	w.writerow(["--Link1--"])
                 #Need to make ActualCombinations Bq
                 #Can use string.replace(Fragment=X/-Bq)
                 #Will need to change header charge
-        w.writerow([LigandHeader()])
-        w.writerow([Ligand()])
-        w.writerow([AllCombos[x]])
-        w.writerow([" "])
-    l = l + 1
-    x = x + 1 
+	w.writerow([LigandHeader()])
+	w.writerow([Ligand()])
+	w.writerow([AllCombos[x]])
+	w.writerow([" "])
+	l = l + 1
+	x = x + 1 
 
 print(CreateFiles(ReadingFile))
