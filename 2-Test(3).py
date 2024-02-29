@@ -2,6 +2,7 @@ import csv
 import itertools
 from collections import defaultdict
 import math 
+import traceback
 import os
 
 k = int(input("How many amino acids are in the structure?: "))
@@ -41,6 +42,8 @@ def calculate_combinations(N, k):
         result *= N - i
         result //= i + 1
     return result
+
+
 
 def CreateFiles(Ligand, FragmentList):
     nCK = calculate_combinations(N, k)
@@ -104,6 +107,7 @@ def CreateFiles(Ligand, FragmentList):
 
     except Exception as e:
         print(f"Error occurred while creating files: {e}")
+        traceback.print_exc()
 
 print("Calling CreateFiles function...")
 CreateFiles(Ligand, FragmentList)
