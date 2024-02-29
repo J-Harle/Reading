@@ -51,8 +51,8 @@ def create_files(ligand, fragment_list, N, output_directory, mem, cores, functio
                 total_multiplicity = 1
                 outputfile.write(str(total_charge + total_multiplicity) + "\n")
 
-                for fragment in combo:
-                    for line in ligand + fragment:  # Combine ligand and fragment
+                for fragment_list_entry in combo:  # Iterate over fragment lists directly
+                    for line in ligand + fragment_list_entry:
                         outputfile.write(line)
                     outputfile.write("\n\n--Link1--\n\n")
 
