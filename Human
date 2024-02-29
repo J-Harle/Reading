@@ -1,7 +1,32 @@
 import csv
 import itertools
 from collections import defaultdict
-from math import comb
+
+# nCK
+def calculate_combination(n, k):
+    if k < 0 or k > n:
+        return 0
+    if k == 0 or k == n:
+        return 1
+    
+    numerator = 1
+    denominator = 1
+    for i in range(1, min(k, n - k) + 1):
+        numerator *= n - i + 1
+        denominator *= i
+    return numerator // denominator
+
+#Aquiring the inputs to create the header:
+k = int(input("How many amino acids are in the structure?: "))
+N = int(input("How many amino acids would you like to include in the interaction?: "))
+UnCorrFileName = input("Which file would you like to open? (Do not include .com): ")
+FileName = UnCorrFileName + ".com"
+Mem = str(int(input("How much memory would you like to use (In GB)?: ")))
+Cores = str(int(input("How many cores would you like to use?: ")))
+Functional = input("Which functional would you like to use?: ")
+BasisSet = input("Which basis set would you like to use?: ")
+Solvent = input("Which solvent would you like to use? If none, leave blank: ")
+OtherInput = input("Would you like any other commands in the command line? If none, leave blank: ")
 
 # Function to read file and extract ligand and fragments
 def reading_file():
@@ -21,10 +46,12 @@ def reading_file():
 
 # Function to create output files
 def create_files(ligand, fragment_list):
-    for i, combo in enumerate(itertools.combinations(fragment_list, N), start=2):
-        with open(str(i) + ".csv", "a") as outputfile:
+    nCK = calculate_combination(len(fragment_list), N)
+    for l in range(2, nCK + 2):
+        combo = list(itertools.combinations(fragment_list, N))[l - 2]
+        with open(str(l) + ".csv", "a") as outputfile:
             w = csv.writer(outputfile, delimiter=" ")
-            w.writerow(["%chk=" + str(i) + ".chk"])
+            w.writerow(["%chk=" + str(l) + ".chk"])
             w.writerow(["%mem=" + Mem + "GB"])
             w.writerow(["nprocshared=" + Cores])
             w.writerow(["#", Functional, " ", BasisSet, "SCRF=Solvent=", Solvent + ")", " ", OtherInput])
@@ -44,18 +71,6 @@ def create_files(ligand, fragment_list):
             w.writerow(ligand)
             w.writerow(combo)
             w.writerow([" "])
-
-# User inputs
-k = int(input("How many amino acids are in the structure?: "))
-N = int(input("How many amino acids would you like to include in the interaction?: "))
-UnCorrFileName = str(input("Which file would you like to open? (Do not include .com): "))
-FileName = UnCorrFileName + ".com"
-Mem = str(int(input("How much memory would you like to use (In GB)?: ")))
-Cores = str(int(input("How many cores would you like to use?: ")))
-Functional = input("Which functional would you like to use?: ")
-BasisSet = input("Which basis set would you like to use?: ")
-Solvent = input("Which solvent would you like to use? If none, leave blank: ")
-OtherInput = input("Would you like any other commands in the command line? If none, leave blank: ")
 
 ligand, fragment_list = reading_file()
 create_files(ligand, fragment_list)
