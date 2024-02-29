@@ -41,7 +41,7 @@ def create_files(ligand, fragment_list, N, output_directory, mem, cores, functio
     try:
         for l, combo in zip(range(2, nCK + 2), itertools.combinations(fragment_list.values(), N)):
             file_path = os.path.join(output_directory, f"{l}.com")
-            print(f"File path: {file_path}")
+            print(f"File path: {file_path}")  # Debug print
 
             # Open the file for writing
             with open(file_path, "w") as outputfile:
