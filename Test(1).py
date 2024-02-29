@@ -42,15 +42,28 @@ def CalculateCombinations(N, k):
 		result //= i + 1
 	return result
 
-def CreateFiles(Ligand, FragmentList):
-    nCK = CalculateCombinations(N, k)
-    OutputDirectory= "Tyrosinase3Body"  # Change each time you want to make a new set of files
-    if not os.path.exists(OutputDirectory):
-        os.makedirs(OutputDirectory)
+def def CreateFiles(Ligand, FragmentList):
+    nCK = calculate_combinations(N, k)
+    output_directory = "output_files"  # Directory to store output files
 
-    for l, combo in zip(range(2, nCK + 2), itertools.combinations(FragmentList.values(), N)):
-        with open(os.path.join(OutputDirectory, f"{l}.com"), "w") as outputfile:
-            w = csv.writer(outputfile, delimiter=" ")
+    # Ensure the output directory exists or create it
+    if not os.path.exists(output_directory):
+        os.makedirs(output_directory)
+
+    try:
+        # Iterate through combinations and create files
+        for l, combo in zip(range(2, nCK + 2), itertools.combinations(FragmentList.values(), N)):
+            file_path = os.path.join(output_directory, f"{l}.csv")
+
+            # Open the file for writing
+            with open(file_path, "w") as outputfile:
+                w = csv.writer(outputfile, delimiter=" ")
+                # Write to the file...
+
+                print(f"File created successfully: {file_path}")
+
+    except Exception as e:
+        print(f"Error occurred while creating files: {e}")
             BaseHeader = [
                 ["%chk=" + str(l) + ".chk"],
                 ["%mem=" + Mem + "GB"],
