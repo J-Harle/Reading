@@ -1,0 +1,61 @@
+import csv
+import itertools
+from collections import defaultdict
+from math import comb
+
+# Function to read file and extract ligand and fragments
+def reading_file():
+    ligand = []
+    fragment_list = defaultdict(list)
+
+    with open(FileName, 'r') as file:
+        for line in file:
+            if "(Fragment=1)" in line:
+                ligand.append(line)
+            for i in range(3, k + 1):
+                fragment = "Fragment=" + str(i)
+                if fragment in line:
+                    fragment_list[i - 1].append(line)
+
+    return ligand, fragment_list
+
+# Function to create output files
+def create_files(ligand, fragment_list):
+    for i, combo in enumerate(itertools.combinations(fragment_list, N), start=2):
+        with open(str(i) + ".csv", "a") as outputfile:
+            w = csv.writer(outputfile, delimiter=" ")
+            w.writerow(["%chk=" + str(i) + ".chk"])
+            w.writerow(["%mem=" + Mem + "GB"])
+            w.writerow(["nprocshared=" + Cores])
+            w.writerow(["#", Functional, " ", BasisSet, "SCRF=Solvent=", Solvent + ")", " ", OtherInput])
+            w.writerow(["Title" + "Card" + "Required"])
+            w.writerow([" "])
+            w.writerow(["TotalCharge", "TotalMultiplicity"])
+            w.writerow([" "])
+            w.writerow(["Ligand"])
+            w.writerow(ligand)
+            w.writerow(["AllCombos"])
+            w.writerow(combo)
+            w.writerow([" "])
+            w.writerow(["--Link1--"])
+            w.writerow(["FragmentHeader"])
+            w.writerow(fragment_list[N])  # Assuming you meant fragment_list[N] here
+            w.writerow(["LigandHeader"])
+            w.writerow(ligand)
+            w.writerow(combo)
+            w.writerow([" "])
+
+# User inputs
+k = int(input("How many amino acids are in the structure?: "))
+N = int(input("How many amino acids would you like to include in the interaction?: "))
+UnCorrFileName = str(input("Which file would you like to open? (Do not include .com): "))
+FileName = UnCorrFileName + ".com"
+Mem = str(int(input("How much memory would you like to use (In GB)?: ")))
+Cores = str(int(input("How many cores would you like to use?: ")))
+Functional = input("Which functional would you like to use?: ")
+BasisSet = input("Which basis set would you like to use?: ")
+Solvent = input("Which solvent would you like to use? If none, leave blank: ")
+OtherInput = input("Would you like any other commands in the command line? If none, leave blank: ")
+
+ligand, fragment_list = reading_file()
+create_files(ligand, fragment_list)
