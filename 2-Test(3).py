@@ -59,25 +59,18 @@ def CreateFiles(Ligand, FragmentList):
 
             # Open the file for writing
             with open(file_path, "w") as outputfile:
-                w = csv.writer(outputfile, delimiter=" ")
-
-                BaseHeader = [
-                    ["%chk=" + str(l) + ".chk"],
-                    ["%mem=" + Mem + "GB"],
-                    ["nprocshared=" + Cores],
-                    ["#", Functional, " ", BasisSet, "SCRF=Solvent=", Solvent + ")", " ", OtherInput],
-                    [" "],
-                    ["Title" + "Card" + "Required"],
-                    [" "]
-                ]
-                w.writerows(BaseHeader)
+                # Write the base header
+                outputfile.write("%chk=" + str(l) + ".chk\n")
+                outputfile.write("%mem=" + Mem + "GB\n")
+                outputfile.write("nprocshared=" + Cores + "\n")
+                outputfile.write("#" + Functional + " " + BasisSet + " SCRF=Solvent=" + Solvent + ") " + OtherInput + "\n")
+                outputfile.write("\n")
+                outputfile.write("TitleCardRequired\n")
+                outputfile.write("\n")
 
                 TotalCharge = 0  # Change if different
                 TotalMultiplicity = 1  # Change if different
-                MainHeader = [
-                    [TotalCharge + TotalMultiplicity]
-                ]
-                w.writerows(MainHeader)
+                outputfile.write(str(TotalCharge + TotalMultiplicity) + "\n")
 
                 for fragment in combo:
                     FragmentCharge = 0        #| Change if different 
@@ -85,29 +78,25 @@ def CreateFiles(Ligand, FragmentList):
                     LigandCharge = 0        #| Change if different
                     LigandMultiplicity = 1     #| Change if different
 
-                    LigandHeader = [
-                        [LigandCharge + LigandMultiplicity]
-                    ]
-                    w.writerows(LigandHeader)
-                    w.writerow(Ligand)
-                    w.writerow(fragment)
-                    w.writerow([" "])
-                    w.writerow(["--Link1--"])
-                    FragmentHeader = [
-                        [FragmentCharge + FragmentMultiplicity]
-                    ]
-                    w.writerows(FragmentHeader)
-                    w.writerow(Ligand)
-                    w.writerow(fragment)
-                    w.writerow([" "])
-                    w.writerow(["--Link1--"])
-                    ActualCombinationHeader = [
-                        [LigandCharge + LigandMultiplicity]
-                    ]
-                    w.writerows(ActualCombinationHeader)
-                    w.writerow(Ligand)
-                    w.writerow(fragment)
-                    w.writerow([" "])
+                    outputfile.write(str(LigandCharge + LigandMultiplicity) + "\n")
+                    outputfile.writelines(Ligand)
+                    outputfile.writelines(fragment)
+                    outputfile.write("\n")
+                    outputfile.write("\n")
+                    outputfile.write("--Link1--\n")
+                    outputfile.write("\n")
+                    outputfile.write(str(FragmentCharge + FragmentMultiplicity) + "\n")
+                    outputfile.writelines(Ligand)
+                    outputfile.writelines(fragment)
+                    outputfile.write("\n")
+                    outputfile.write("\n")
+                    outputfile.write("--Link1--\n")
+                    outputfile.write("\n")
+                    outputfile.write(str(LigandCharge + LigandMultiplicity) + "\n")
+                    outputfile.writelines(Ligand)
+                    outputfile.writelines(fragment)
+                    outputfile.write("\n")
+                    outputfile.write("\n")
 
             print(f"File created successfully: {file_path}")
 
