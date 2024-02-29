@@ -33,18 +33,6 @@ def ReadingFile():
 
 Ligand, FragmentList = ReadingFile()
 
-def calculate_combinations(N, k):
-    if k == 0 or k == N:
-        return 1
-    k -= min(k, N - k)
-    result = 1
-    for i in range(k):
-        result *= N - i
-        result //= i + 1
-    return result
-
-
-
 def CreateFiles(Ligand, FragmentList):
     nCK = calculate_combinations(N, k)
     output_directory = "output_files"  # Directory to store output files
@@ -59,6 +47,11 @@ def CreateFiles(Ligand, FragmentList):
         for l, combo in zip(range(2, nCK + 2), itertools.combinations(FragmentList.values(), N)):
             file_path = os.path.join(output_directory, f"{l}.com")
             print(f"File path: {file_path}")
+
+            # Check if combo is valid
+            if len(combo) != N:
+                print(f"Invalid combination: {combo}")
+                continue
 
             # Open the file for writing
             with open(file_path, "w") as outputfile:
