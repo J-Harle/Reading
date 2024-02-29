@@ -50,9 +50,12 @@ def CreateFiles(Ligand, FragmentList):
     if not os.path.exists(output_directory):
         os.makedirs(output_directory)
 
+    print("Calling CreateFiles function...")
+
     try:
         for l, combo in zip(range(2, nCK + 2), itertools.combinations(FragmentList.values(), N)):
             file_path = os.path.join(output_directory, f"{l}.com")
+            print(f"File path: {file_path}")
 
             # Open the file for writing
             with open(file_path, "w") as outputfile:
@@ -113,4 +116,5 @@ def CreateFiles(Ligand, FragmentList):
     except Exception as e:
         print(f"Error occurred while creating files: {e}")
 
+print("Calling CreateFiles function...")
 CreateFiles(Ligand, FragmentList)
