@@ -1,98 +1,81 @@
 import csv
 import itertools
 from collections import defaultdict
-import math 
-import traceback
 import os
+import traceback
 
-k = int(input("How many amino acids are in the structure?: "))
-N = int(input("How many amino acids would you like to include in the interaction?: "))
-UnCorrFileName = str(input("Which file would you like to open? (Do not include .com): "))
-FileName = UnCorrFileName + ".com"
-Mem = str(int(input("How much memory would you like to use (In GB)?: ")))
-Cores = str(int(input("How many cores would you like to use?: ")))
-Functional = input("Which functional would you like to use?: ")
-BasisSet = input("Which basis set would you like to use?: ")
-Solvent = input("Which solvent would you like to use? If none, leave blank: ")
-OtherInput = input("Would you like any other commands in the command line? If none, leave blank: ")
+def calculate_combinations(N, k):
+    """Calculate the number of combinations."""
+    if k == 0 or k == N:
+        return 1
+    k -= min(k, N - k)
+    result = 1
+    for i in range(k):
+        result *= N - i
+        result //= i + 1
+    return result
 
-def ReadingFile():
-    Ligand = []
-    with open(FileName, 'r') as File:
-        for line in File:
+def read_file(filename, k):
+    """Read the file and extract ligand and fragments."""
+    ligand = []
+    fragment_list = defaultdict(list)
+    with open(filename, 'r') as file:
+        for line in file:
             if "(Fragment=1)" in line:
-                Ligand.append(line)
-    FragmentList = defaultdict(list)
+                ligand.append(line)
     for i in range(3, k + 1, 1):
-        with open(FileName, 'r') as File:
-            Fragment = "Fragment=" + str(i)
-            for line in File:
-                if Fragment in line:
-                    FragmentList[i - 1].append(line)
-    return Ligand, FragmentList
+        with open(filename, 'r') as file:
+            fragment = "Fragment=" + str(i)
+            for line in file:
+                if fragment in line:
+                    fragment_list[i - 1].append(line)
+    return ligand, fragment_list
 
-Ligand, FragmentList = ReadingFile()
-
-def CreateFiles(Ligand, FragmentList):
-    nCK = calculate_combinations(N, k)
-    output_directory = "output_files"  # Directory to store output files
-
-    # Ensure the output directory exists or create it
+def create_files(ligand, fragment_list, N, output_directory, mem, cores, functional, basis_set, solvent, other_input):
+    """Create input files for different combinations of fragments."""
+    nCK = calculate_combinations(N, len(fragment_list))
     if not os.path.exists(output_directory):
         os.makedirs(output_directory)
 
-    print("Calling CreateFiles function...")
-
+    print("Creating input files...")
     try:
-        for l, combo in zip(range(2, nCK + 2), itertools.combinations(FragmentList.values(), N)):
+        for l, combo in zip(range(2, nCK + 2), itertools.combinations(fragment_list.values(), N)):
             file_path = os.path.join(output_directory, f"{l}.com")
             print(f"File path: {file_path}")
-
-            # Check if combo is valid
-            if len(combo) != N:
-                print(f"Invalid combination: {combo}")
-                continue
 
             # Open the file for writing
             with open(file_path, "w") as outputfile:
                 # Write the base header
                 outputfile.write("%chk=" + str(l) + ".chk\n")
-                outputfile.write("%mem=" + Mem + "GB\n")
-                outputfile.write("nprocshared=" + Cores + "\n")
-                outputfile.write("#" + Functional + " " + BasisSet + " SCRF=Solvent=" + Solvent + ") " + OtherInput + "\n")
+                outputfile.write("%mem=" + mem + "GB\n")
+                outputfile.write("nprocshared=" + cores + "\n")
+                outputfile.write("#" + functional + " " + basis_set + " SCRF=Solvent=" + solvent + ") " + other_input + "\n")
                 outputfile.write("\n")
                 outputfile.write("TitleCardRequired\n")
                 outputfile.write("\n")
 
-                TotalCharge = 0  # Change if different
-                TotalMultiplicity = 1  # Change if different
-                outputfile.write(str(TotalCharge + TotalMultiplicity) + "\n")
+                total_charge = 0
+                total_multiplicity = 1
+                outputfile.write(str(total_charge + total_multiplicity) + "\n")
 
                 for fragment in combo:
-                    FragmentCharge = 0        #| Change if different 
-                    FragmentMultiplicity = 1    #| Change if different
-                    LigandCharge = 0        #| Change if different
-                    LigandMultiplicity = 1     #| Change if different
+                    fragment_charge = 0
+                    fragment_multiplicity = 1
+                    ligand_charge = 0
+                    ligand_multiplicity = 1
 
-                    outputfile.write(str(LigandCharge + LigandMultiplicity) + "\n")
-                    outputfile.writelines(Ligand)
+                    outputfile.write(str(ligand_charge + ligand_multiplicity) + "\n")
+                    outputfile.writelines(ligand)
                     outputfile.writelines(fragment)
-                    outputfile.write("\n")
-                    outputfile.write("\n")
-                    outputfile.write("--Link1--\n")
-                    outputfile.write("\n")
-                    outputfile.write(str(FragmentCharge + FragmentMultiplicity) + "\n")
-                    outputfile.writelines(Ligand)
+                    outputfile.write("\n\n--Link1--\n\n")
+                    outputfile.write(str(fragment_charge + fragment_multiplicity) + "\n")
+                    outputfile.writelines(ligand)
                     outputfile.writelines(fragment)
-                    outputfile.write("\n")
-                    outputfile.write("\n")
-                    outputfile.write("--Link1--\n")
-                    outputfile.write("\n")
-                    outputfile.write(str(LigandCharge + LigandMultiplicity) + "\n")
-                    outputfile.writelines(Ligand)
+                    outputfile.write("\n\n--Link1--\n\n")
+                    outputfile.write(str(ligand_charge + ligand_multiplicity) + "\n")
+                    outputfile.writelines(ligand)
                     outputfile.writelines(fragment)
-                    outputfile.write("\n")
-                    outputfile.write("\n")
+                    outputfile.write("\n\n")
 
             print(f"File created successfully: {file_path}")
 
@@ -102,5 +85,29 @@ def CreateFiles(Ligand, FragmentList):
         print(f"Error occurred while creating files: {e}")
         traceback.print_exc()
 
-print("Calling CreateFiles function...")
-CreateFiles(Ligand, FragmentList)
+def main():
+    try:
+        k = int(input("How many amino acids are in the structure?: "))
+        N = int(input("How many amino acids would you like to include in the interaction?: "))
+        uncorr_file_name = input("Which file would you like to open? (Do not include .com): ")
+        file_name = uncorr_file_name + ".com"
+        mem = str(int(input("How much memory would you like to use (In GB)?: ")))
+        cores = str(int(input("How many cores would you like to use?: ")))
+        functional = input("Which functional would you like to use?: ")
+        basis_set = input("Which basis set would you like to use?: ")
+        solvent = input("Which solvent would you like to use? If none, leave blank: ")
+        other_input = input("Would you like any other commands in the command line? If none, leave blank: ")
+
+        ligand, fragment_list = read_file(file_name, k)
+        output_directory = "output_files"
+
+        create_files(ligand, fragment_list, N, output_directory, mem, cores, functional, basis_set, solvent, other_input)
+
+    except ValueError:
+        print("Invalid input! Please enter a valid integer.")
+    except Exception as e:
+        print(f"An error occurred: {e}")
+        traceback.print_exc()
+
+if __name__ == "__main__":
+    main()
