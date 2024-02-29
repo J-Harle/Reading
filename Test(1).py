@@ -42,7 +42,7 @@ def CalculateCombinations(N, k):
 		result //= i + 1
 	return result
 
-def def CreateFiles(Ligand, FragmentList):
+def CreateFiles(Ligand, FragmentList):
     nCK = calculate_combinations(N, k)
     output_directory = "output_files"  # Directory to store output files
 
