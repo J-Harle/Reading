@@ -106,7 +106,9 @@ def CreateFiles(Ligand, FragmentList):
                     w.writerow(fragment)
                     w.writerow([" "])
 
-        print(f"Files created successfully in directory: {output_directory}")
+            print(f"File created successfully: {file_path}")
+
+        print(f"All files created successfully in directory: {output_directory}")
 
     except Exception as e:
         print(f"Error occurred while creating files: {e}")
