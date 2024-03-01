@@ -42,26 +42,20 @@ def create_files(ligand, fragment_list, N, Mem, Cores, Functional, BasisSet, Sol
 		"\n"
             ]
 
-            LigandHeader = BaseHeader.copy()
-            LigandHeader.append(f"{LigandCharge} {LigandMultiplicity}\n")
-
-            FragmentHeader = BaseHeader.copy()
-            FragmentHeader.append(f"{FragmentCharge} {FragmentMultiplicity}\n")
-
-            TotalHeader = BaseHeader.copy()
-            TotalHeader.append(f"{TotalCharge} {TotalMultiplicity}\n")
-
-            outputfile.writelines(TotalHeader)
+                       outputfile.writelines(TotalHeader)
             outputfile.writelines(ligand)
-            outputfile.writelines(str(combo))
+            for fragment in combo:
+                outputfile.writelines(fragment)
             outputfile.write("\n--Link1--\n")
             outputfile.writelines(FragmentHeader)
             outputfile.writelines(ligand)
-            outputfile.writelines(str(combo))
+            for fragment in combo:
+                outputfile.writelines(fragment)
             outputfile.write("\n--Link1--\n")
             outputfile.writelines(LigandHeader)
             outputfile.writelines(ligand)
-            outputfile.writelines(str(combo))
+            for fragment in combo:
+                outputfile.writelines(fragment)
             outputfile.write("\n")
 
 k = int(input("How many amino acids are in the structure?: "))
