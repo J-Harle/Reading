@@ -22,7 +22,7 @@ def generate_combinations(fragment_list, N):
     return combinations
 
 def create_files(ligand, fragment_list, x):
-    nCK = calculate_combination(len(fragment_list), N)
+    nCK = generate_combinations(len(fragment_list), N)
     for l in range(2, nCK + 2):
         combo = x[l - 2]
         with open(str(l) + "-New.com", "a") as outputfile:
