@@ -2,7 +2,7 @@ import csv
 import itertools
 from collections import defaultdict
 
-def reading_file():
+def reading_file(FileName, k):
     ligand = []
     fragment_list = defaultdict(list)
 
@@ -21,10 +21,9 @@ def generate_combinations(fragment_list, N):
     combinations = list(itertools.combinations(fragment_list.values(), N))
     return combinations
 
-def create_files(ligand, fragment_list, x):
-    nCK = generate_combinations(len(fragment_list), N)
-    for l in range(2, nCK + 2):
-        combo = x[l - 2]
+def create_files(ligand, fragment_list, N):
+    combinations = generate_combinations(fragment_list, N)
+    for l, combo in enumerate(combinations, start=2):
         with open(str(l) + "-New.com", "a") as outputfile:
             w = csv.writer(outputfile, delimiter=" ")
 
@@ -33,35 +32,23 @@ def create_files(ligand, fragment_list, x):
             TotalCharge = FragmentCharge + LigandCharge
             FragmentMultiplicity = 1
             LigandMultiplicity = 1
-            if FragmentMultiplicity >= LigandMultiplicity:
-                TotalMultiplicity = FragmentMultiplicity
-            else:
-                TotalMultiplicity = LigandMultiplicity
+            TotalMultiplicity = max(FragmentMultiplicity, LigandMultiplicity)
 
             BaseHeader = [
-                ["%chk=" +str(l)+"-New" + ".chk"],
-                ["%mem=" + Mem + "GB"],
-                ["%nprocshared=" + Cores],
-                ["#", Functional + " ", BasisSet + "SCRF=(Solvent="+ Solvent + ")"+ " "+ OtherInput],
-                [" "],
-                ["Eeby Deeby"],
-                [" "]
+                "%chk=" + str(l) + "-New" + ".chk",
+                "%mem=" + Mem + "GB",
+                "%nprocshared=" + Cores,
+                "#" + Functional + " " + BasisSet + "SCRF=(Solvent=" + Solvent + ")" + " " + OtherInput,
+                "",
+                "Eeby Deeby",
+                ""
             ]
 
-            LigandHeader = [
-                [BaseHeader],
-                [LigandCharge, LigandMultiplicity]  # Separate charge and multiplicity
-            ]
+            LigandHeader = BaseHeader + [f"{LigandCharge} {LigandMultiplicity}"]
 
-            FragmentHeader = [
-                [BaseHeader],
-                [FragmentCharge, FragmentMultiplicity]  # Separate charge and multiplicity
-            ]
+            FragmentHeader = BaseHeader + [f"{FragmentCharge} {FragmentMultiplicity}"]
 
-            TotalHeader = [
-                [BaseHeader],
-                [TotalCharge, TotalMultiplicity]  # Separate charge and multiplicity
-            ]
+            TotalHeader = BaseHeader + [f"{TotalCharge} {TotalMultiplicity}"]
 
             w.writerow(TotalHeader)
             w.writerow(ligand)
@@ -90,6 +77,5 @@ BasisSet = input("Which basis set would you like to use?: ")
 Solvent = input("Which solvent would you like to use? If none, leave blank: ")
 OtherInput = input("Would you like any other commands in the command line? If none, leave blank: ")
 
-ligand, fragment_list = reading_file()
-x = generate_combinations(fragment_list, N)
-create_files(ligand, fragment_list, x)
+ligand, fragment_list = reading_file(FileName, k)
+create_files(ligand, fragment_list, N)
