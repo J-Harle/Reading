@@ -18,8 +18,11 @@ def reading_file(FileName, k):
 
 def generate_combinations(fragment_list, N):
     fragments = list(fragment_list.values())
-    combinations = list(itertools.combinations(fragments, N))
-    return combinations
+    combinations = itertools.product(fragments, repeat=N)
+    unique_combinations = set()
+    for combo in combinations:
+        unique_combinations.add(tuple(sorted(combo)))  # Sorting ensures uniqueness
+    return unique_combinations
 
 def create_files(ligand, fragment_list, N, Mem, Cores, Functional, BasisSet, Solvent, OtherInput):
     combinations = generate_combinations(fragment_list, N)
