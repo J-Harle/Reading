@@ -38,26 +38,38 @@ def create_files(ligand, fragment_list, N, Mem, Cores, Functional, BasisSet, Sol
                 f"%nprocshared={Cores}\n",
                 f"#{Functional} {BasisSet} SCRF=(Solvent={Solvent}) {OtherInput}\n",
                 "\n",
-                "Eeby Deeby\n"
-		"\n"
+                "Eeby Deeby\n\n"
             ]
 
-                       outputfile.writelines(TotalHeader)
+            LigandHeader = BaseHeader.copy()
+            LigandHeader.append(f"{LigandCharge} {LigandMultiplicity}\n")
+
+            FragmentHeader = BaseHeader.copy()
+            FragmentHeader.append(f"{FragmentCharge} {FragmentMultiplicity}\n")
+
+            TotalHeader = BaseHeader.copy()
+            TotalHeader.append(f"{TotalCharge} {TotalMultiplicity}\n")
+
+            outputfile.writelines(TotalHeader)
             outputfile.writelines(ligand)
             for fragment in combo:
                 outputfile.writelines(fragment)
+                outputfile.write('\n')  # Ensure each fragment is on a new line
             outputfile.write("\n--Link1--\n")
             outputfile.writelines(FragmentHeader)
             outputfile.writelines(ligand)
             for fragment in combo:
                 outputfile.writelines(fragment)
+                outputfile.write('\n')  # Ensure each fragment is on a new line
             outputfile.write("\n--Link1--\n")
             outputfile.writelines(LigandHeader)
             outputfile.writelines(ligand)
             for fragment in combo:
                 outputfile.writelines(fragment)
+                outputfile.write('\n')  # Ensure each fragment is on a new line
             outputfile.write("\n")
 
+# User inputs and execution
 k = int(input("How many amino acids are in the structure?: "))
 N = int(input("How many amino acids would you like to include in the interaction?: "))
 UnCorrFileName = input("Which file would you like to open? (Do not include .com): ")
