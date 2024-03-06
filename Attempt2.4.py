@@ -35,14 +35,14 @@ def GenerateCombinations(Fragments, K):
 
 def Headers(FragmentCombinations, ligand, user_inputs):
     k, N, FileName, Mem, Cores, Functional, BasisSet, Solvent = user_inputs
-    counter = 2  # Initialize counter outside the loop
+    counter = 2  
     for combo in FragmentCombinations:
-        OutputFileName = str(counter) + "-New.com"  # Define OutputFileName inside the loop
+        OutputFileName = str(counter) + "-New.com"  
         with open(OutputFileName, "a") as outputfile:
-            FragmentCharge = 0  # Assuming these values are fixed for now
-            LigandCharge = 0    # You may adjust them as per your requirements
-            FragmentMultiplicity = 1
-            LigandMultiplicity = 1
+            FragmentCharge = 0  #Change as needed
+            LigandCharge = 0    #Change as needed
+            FragmentMultiplicity = 1 #Change as needed
+            LigandMultiplicity = 1 #Change as needed
             TotalCharge = FragmentCharge + LigandCharge
             TotalMultiplicity = max(FragmentMultiplicity, LigandMultiplicity)
             
