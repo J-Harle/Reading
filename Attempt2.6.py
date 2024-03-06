@@ -38,7 +38,7 @@ def ReadingFile(FileName, k):
 
 def GenerateCombinations(Fragments, K):
     FragmentCombinations = itertools.combinations(Fragments, K)
-    return FragmentCombinations
+    return list(FragmentCombinations)
 
 def Headers(FragmentCombinations, ligand, user_inputs):
     k, N, FileName, Mem, Cores, Functional, BasisSet, Solvent = user_inputs
