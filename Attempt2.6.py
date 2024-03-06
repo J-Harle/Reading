@@ -42,10 +42,12 @@ def GenerateCombinations(Fragments, K):
 
 def Headers(FragmentCombinations, ligand, user_inputs):
     k, N, FileName, Mem, Cores, Functional, BasisSet, Solvent = user_inputs
-    counter = 2 
-    OutputFileName = str(counter)
+    counter = 1  # Initialize counter for output file names
+    
     for combo in FragmentCombinations:
-        with open(str(OutputFileName + "-New.com"), "a") as outputfile:
+        output_file_name = str(counter) + "-New.com"  # Unique output file name for each combination
+        
+        with open(output_file_name, "w") as outputfile:  # Use 'w' mode to create new file
             FragmentCharge = 0  # Assuming these values are fixed for now
             LigandCharge = 0    # You may adjust them as per your requirements
             FragmentMultiplicity = 1
@@ -54,7 +56,7 @@ def Headers(FragmentCombinations, ligand, user_inputs):
             TotalMultiplicity = max(FragmentMultiplicity, LigandMultiplicity)
             
             BaseHeader = [
-                "%chk=" + str(OutputFileName) + "-New" + ".chk" + "\n",
+                "%chk=" + str(counter) + "-New" + ".chk" + "\n",
                 "%mem=" + Mem + "GB" + "\n",
                 "%nprocshared=" + Cores + "\n",
                 "#" + " " + Functional +  " "+ BasisSet + " " + "SCRF=(Solvent=" + Solvent + ")" + "\n",
@@ -83,7 +85,8 @@ def Headers(FragmentCombinations, ligand, user_inputs):
             outputfile.writelines(ligand)
             for fragment in combo:
                 outputfile.writelines(fragment)
-            counter += 1
+        
+        counter += 1
 
 user_inputs = UserInputs()
 k, N, FileName, Mem, Cores, Functional, BasisSet, Solvent = user_inputs
