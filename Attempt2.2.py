@@ -35,9 +35,9 @@ def GenerateCombinations(Fragments, K):
 
 def Headers(FragmentCombinations, ligand, user_inputs):
     k, N, FileName, Mem, Cores, Functional, BasisSet, Solvent = user_inputs
-    NewFileName = 2
     for combo in FragmentCombinations:
-        OutputFileName = 'Fragments_' + ','.join(str(frag_id) for frag_id in combo)
+        OutputFileName = 'Fragments_' + '_'.join(str(frag_id) for frag_id in combo)  # Use fragment IDs for file naming
+        
         with open(str(OutputFileName) + "-New.com", "a") as outputfile:
             FragmentCharge = 0  # Assuming these values are fixed for now
             LigandCharge = 0    # You may adjust them as per your requirements
@@ -47,7 +47,7 @@ def Headers(FragmentCombinations, ligand, user_inputs):
             TotalMultiplicity = max(FragmentMultiplicity, LigandMultiplicity)
             
             BaseHeader = [
-                "%chk=" + str(combo) + "-New" + "\n",
+                "%chk=" + str(OutputFileName) + "-New" + "\n",
                 "%mem=" + Mem + "GB" + "\n",
                 "%nprocshared=" + Cores + "\n",
                 "#" + Functional + BasisSet + "SCRF=(Solvent=" + Solvent + ")" + "\n",
