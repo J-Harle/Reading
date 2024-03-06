@@ -35,6 +35,7 @@ def GenerateCombinations(Fragments, K):
 
 def Headers(FragmentCombinations, ligand, UserInputs):
     k, N, FileName, Mem, Cores, Functional, BasisSet, Solvent = UserInputs
+    NewFileName = 2
     for combo in FragmentCombinations:
         with open(str(combo) + "-New.com", "a") as outputfile:
             FragmentCharge = 0  # Assuming these values are fixed for now
@@ -73,6 +74,8 @@ def Headers(FragmentCombinations, ligand, UserInputs):
             outputfile.writelines(ligand)
             for fragment in combo:
                 outputfile.writelines(fragment)
+        NewFileName += 1
+    
 
 k, N, FileName, Mem, Cores, Functional, BasisSet, Solvent = UserInputs()
 ligand, fragment_list = ReadingFile(FileName, k)
