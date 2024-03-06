@@ -37,12 +37,15 @@ def Headers(FragmentCombinations, ligand, user_inputs):
     k, N, FileName, Mem, Cores, Functional, BasisSet, Solvent = user_inputs
     NewFileName = 2
     for combo in FragmentCombinations:
-        with open(str(combo) + "-New.com", "a") as outputfile:
+        OutputFileName = 'Fragments_' + ','.join(str(frag_id) for frag_id in combo)
+        with open(str(OutputFileName) + "-New.com", "a") as outputfile:
             FragmentCharge = 0  # Assuming these values are fixed for now
             LigandCharge = 0    # You may adjust them as per your requirements
             FragmentMultiplicity = 1
             LigandMultiplicity = 1
-
+            TotalCharge = FragmentCharge + LigandCharge
+            TotalMultiplicity = max(FragmentMultiplicity, LigandMultiplicity)
+            
             BaseHeader = [
                 "%chk=" + str(combo) + "-New" + "\n",
                 "%mem=" + Mem + "GB" + "\n",
@@ -52,8 +55,6 @@ def Headers(FragmentCombinations, ligand, user_inputs):
                 "AAAAAAAAAAAAAAAAAAAAAAAAAAAAAA\n"
             ]
 
-            TotalCharge = FragmentCharge + LigandCharge
-            TotalMultiplicity = max(FragmentMultiplicity, LigandMultiplicity)
             TotalHeader = BaseHeader + [str(TotalCharge) + " " + str(TotalMultiplicity) + "\n"]
 
             LigandHeader = BaseHeader + [str(LigandCharge) + " " + str(LigandMultiplicity) + "\n"]
@@ -74,9 +75,7 @@ def Headers(FragmentCombinations, ligand, user_inputs):
             outputfile.writelines(ligand)
             for fragment in combo:
                 outputfile.writelines(fragment)
-        NewFileName += 1
     
-
 user_inputs = UserInputs()
 k, N, FileName, Mem, Cores, Functional, BasisSet, Solvent = user_inputs
 ligand, fragment_list = ReadingFile(FileName, k)
