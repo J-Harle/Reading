@@ -33,8 +33,8 @@ def GenerateCombinations(Fragments, K):
     FragmentCombinations = itertools.combinations(Fragments, K)
     return FragmentCombinations
 
-def Headers(FragmentCombinations, ligand, UserInputs):
-    k, N, FileName, Mem, Cores, Functional, BasisSet, Solvent = UserInputs
+def Headers(FragmentCombinations, ligand, user_inputs):
+    k, N, FileName, Mem, Cores, Functional, BasisSet, Solvent = user_inputs
     NewFileName = 2
     for combo in FragmentCombinations:
         with open(str(combo) + "-New.com", "a") as outputfile:
@@ -77,7 +77,8 @@ def Headers(FragmentCombinations, ligand, UserInputs):
         NewFileName += 1
     
 
-k, N, FileName, Mem, Cores, Functional, BasisSet, Solvent = UserInputs()
+user_inputs = UserInputs()
+k, N, FileName, Mem, Cores, Functional, BasisSet, Solvent = user_inputs
 ligand, fragment_list = ReadingFile(FileName, k)
 FragmentCombinations = GenerateCombinations(fragment_list.values(), N)
-Headers(FragmentCombinations, ligand, UserInputs())
+Headers(FragmentCombinations, ligand, user_inputs)
