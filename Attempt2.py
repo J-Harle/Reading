@@ -34,57 +34,57 @@ def GenerateCombinations():
   FragmentCombinations = itertools.combinations(Fragments, K)
   return FragmentCombinations
 
-def Headers(GenerateCombinations):
+def Headers(GenerateCombinations, UserInputs):
+  FileName = range(2, len(FragmentCombinations) + 1, 1)
   FragmentCombinations = GenerateCombinations(Fragments, N)
   for FileName in FragmentCombinations:
     with open(str(FileName) + "-New.com", "a") as outputfile:
   
-    FragmentCharge = 0
-    LigandCharge = 0
-    TotalCharge = FragmentCharge + LigandCharge
-    FragmentMultiplicity = 1
-    LigandMultiplicity = 1
-    TotalMultiplicity = max(FragmentMultiplicity, LigandMultiplicity)
+      FragmentCharge = 0
+      LigandCharge = 0
+      TotalCharge = FragmentCharge + LigandCharge
+      FragmentMultiplicity = 1
+      LigandMultiplicity = 1
+      TotalMultiplicity = max(FragmentMultiplicity, LigandMultiplicity)
 
-    BaseHeader = [
-    "%chk=" + str(FileNumber)+ "-New" + "\n"
-    "%mem=" + Mem + "GB" + "\n"
-    "%nprocshared=" + Cores + "\n"
-    "#" + Functional + BasisSet + "SCRF=(Solvent=" + Solvent + ")" + "\n"
-    "\n"
-    "AAAAAAAAAAAAAAAAAAAAAAAAAAAAAA"
-    "\n"
-    ]
+      BaseHeader = [
+      "%chk=" + str(FileNumber)+ "-New" + "\n"
+      "%mem=" + Mem + "GB" + "\n"
+      "%nprocshared=" + Cores + "\n"
+      "#" + Functional + BasisSet + "SCRF=(Solvent=" + Solvent + ")" + "\n"
+      "\n"
+      "AAAAAAAAAAAAAAAAAAAAAAAAAAAAAA"
+      "\n"
+      ]
 
-  TotalHeader = BaseHeader + [
-  str(TotalCharge) + " " + str(TotalMultiplicity) + "\n"
-  ]
+      TotalHeader = BaseHeader + [
+      str(TotalCharge) + " " + str(TotalMultiplicity) + "\n"
+      ]
 
-  LigandHeader = BaseHeader + [
-  str(LigandCharge) + " " + str(LigandMultiplicity) + "\n"
-  ] 
+      LigandHeader = BaseHeader + [
+      str(LigandCharge) + " " + str(LigandMultiplicity) + "\n"
+      ] 
 
-  FragmentHeader = BaseHeader + [
-  str(FragmentHeader) + " " + str(FragmentMultiplicity) + "\n"
-  ]
+      FragmentHeader = BaseHeader + [
+      str(FragmentHeader) + " " + str(FragmentMultiplicity) + "\n"
+      ]
 
-  outputfile.writelines(TotalHeader)
-  outputfile.writelines(ligand)
-  for fragment in combo:
-    outputfile.writelines(fragment)
-   # outputfile.write('\n')  # Ensure each fragment is on a new line
-  outputfile.write("\n--Link1--\n")
-  outputfile.writelines(FragmentHeader)
-  outputfile.writelines(ligand)
-  for fragment in combo:
-    outputfile.writelines(fragment)
-    #outputfile.write('\n')  # Ensure each fragment is on a new line
-  outputfile.write("\n--Link1--\n")
-  outputfile.writelines(LigandHeader)
-  outputfile.writelines(ligand)
-  for fragment in combo:
-    outputfile.writelines(fragment)
-    #outputfile.write('\n')  # Ensure each fragment is on a new line
+      outputfile.writelines(TotalHeader)
+      outputfile.writelines(ligand)
+      for fragment in combo:
+        outputfile.writelines(fragment)
+     # outputfile.write('\n')  #Look at output files to see if these are needed.
+      outputfile.write("\n--Link1--\n")
+      outputfile.writelines(FragmentHeader)
+      outputfile.writelines(ligand)
+      for fragment in combo:
+        outputfile.writelines(fragment)
+        #outputfile.write('\n') 
+      outputfile.write("\n--Link1--\n")
+      outputfile.writelines(LigandHeader)
+      outputfile.writelines(ligand)
+      for fragment in combo:
+        outputfile.writelines(fragment)
+        #outputfile.write('\n')  
 
-ligand, FragmentList = ReadingFile(FileName, K)
-create_files(ligand,fragment_list, UserInputs)
+Headers(ReadingFile,ligand,fragment_list, UserInputs)
