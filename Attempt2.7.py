@@ -76,7 +76,7 @@ def Headers(fragment_combinations, ligand, k, N, file_name, mem, cores, function
                 outputfile.writelines(fragment_header)
                 outputfile.writelines(ligand)
                 for fragment in combo:
-                    fragment = fragment.replace("(Fragment=1)", "-Bq")
+                    fragment = [fragment.replace("(Fragment=1)", "-Bq") for fragment in fragment]
                     outputfile.writelines(fragment)
                 outputfile.write("\n--Link1--\n")
                 
@@ -84,7 +84,7 @@ def Headers(fragment_combinations, ligand, k, N, file_name, mem, cores, function
                 outputfile.writelines(ligand_header)
                 outputfile.writelines(ligand)
                 for fragment in combo:
-                    fragment = fragment.replace("(Fragment=", "-Bq")
+                    fragment = [fragment.replace("(Fragment=", "-Bq") for fragment in fragment]
                     outputfile.writelines(fragment)
                 outputfile.write("\n--Link1--\n")
 
