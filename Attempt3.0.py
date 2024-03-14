@@ -39,48 +39,56 @@ def GenerateCombinations(Fragments, K):
     FragmentCombinations = itertools.combinations(Fragments, K)
     return FragmentCombinations
 
-def Headers(FragmentCombinations, ligand, k, N, FileName, Mem, Cores, Functional, BasisSet, Solvent, CorrSolvent):
+def headers(fragment_combinations, ligand, k, N, file_name, mem, cores, functional, basis_set, solvent, corr_solvent):
     counter = 1
-    for combo in FragmentCombinations:
-        OutputFile = str(counter) + "-New.com"
-        with open(OutputFile, "w") as outputfile:
-            FragmentCharge = 0
-            LigandCharge = 0
-            FragmentMultiplicity = 1
-            LigandMultiplicity = 1
-            TotalCharge = FragmentCharge + LigandCharge
-            TotalMultiplicity = max(FragmentMultiplicity, LigandMultiplicity)
+    for combo in fragment_combinations:
+        output_file = str(counter) + "-New.com"
+        with open(output_file, "w") as outputfile:
+            fragment_charge = 0
+            ligand_charge = 0
+            fragment_multiplicity = 1
+            ligand_multiplicity = 1
+            total_charge = fragment_charge + ligand_charge
+            total_multiplicity = max(fragment_multiplicity, ligand_multiplicity)
 
-            BaseHeader = [
+            base_header = [
                 "%chk=" + str(counter) + "-New" + ".chk" + "\n",
-                "%mem=" + Mem + "GB" + "\n",
-                "%nprocshared=" + Cores + "\n",
-                "#" + " " + Functional + " " + BasisSet + (" " + CorrSolvent if CorrSolvent else "") + "\n",
+                "%mem=" + mem + "GB" + "\n",
+                "%nprocshared=" + cores + "\n",
+                "#" + " " + functional + " " + basis_set + (" " + corr_solvent if corr_solvent else "") + "\n",
                 "\n",
                 "MSc Project Code" + "\n",
                 "\n"
             ]
 
-            TotalHeader = BaseHeader + [str(TotalCharge) + " " + str(TotalMultiplicity) + "\n"]
+            total_header = base_header + [str(total_charge) + " " + str(total_multiplicity) + "\n"]
+            ligand_header = base_header + [str(ligand_charge) + " " + str(ligand_multiplicity) + "\n"]
+            fragment_header = base_header + [str(fragment_charge) + " " + str(fragment_multiplicity) + "\n"]
 
-            LigandHeader = BaseHeader + [str(LigandCharge) + " " + str(LigandMultiplicity) + "\n"]
-
-            FragmentHeader = BaseHeader + [str(FragmentCharge) + " " + str(FragmentMultiplicity) + "\n"]
-
-            # Write ligand and header
-            outputfile.writelines(TotalHeader)
+            outputfile.writelines(total_header)
             outputfile.writelines(ligand)
-
-            # Write interactions between ligand and fragments
             for fragment in combo:
                 outputfile.writelines(fragment)
+            outputfile.write("\n--Link1--\n")
+            outputfile.writelines(fragment_header)
+            outputfile.writelines(ligand)
+            for fragment in combo:
+                outputfile.writelines(fragment)
+            outputfile.write("\n--Link1--\n")
+            outputfile.writelines(ligand_header)
+            outputfile.writelines(ligand)
+            for fragment in combo:
+                outputfile.writelines(fragment)
+            outputfile.writelines("\n")
 
-            # Write interactions between fragments
-            for fragment1, fragment2 in itertools.combinations(combo, 2):
-                outputfile.write("\n--Link1--\n")
-                outputfile.writelines(FragmentHeader)
-                outputfile.writelines(fragment1)
-                outputfile.writelines(fragment2)
+            if N == 2:  # Generate additional combinations when N=2
+                outputfile.write(f"{ligand[0].strip()} + {combo[0].strip()} + {combo[1].strip()}\n")
+                outputfile.write(f"{ligand[0].strip()} + {combo[0].strip()}(Bq) + {combo[1].strip()}\n")
+                outputfile.write(f"{ligand[0].strip()} + {combo[0].strip()} + {combo[1].strip()}(Bq)\n")
+                outputfile.write(f"{ligand[0].strip()}(Bq) + {combo[0].strip()}(Bq) + {combo[1].strip()}\n")
+                outputfile.write(f"{ligand[0].strip()}(Bq) + {combo[0].strip()}(Bq) + {combo[1].strip()}(Bq)\n")
+                outputfile.write(f"{ligand[0].strip()}(Bq) + {combo[0].strip()} + {combo[1].strip()}\n")
+                outputfile.write(f"{ligand[0].strip()}(Bq) + {combo[0].strip()} + {combo[1].strip()}(Bq)\n")
 
             counter += 1
 
