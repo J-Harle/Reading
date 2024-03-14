@@ -63,24 +63,38 @@ def Headers(FragmentCombinations, ligand, UserInputs):
             LigandHeader = BaseHeader + [str(LigandCharge) + " " + str(LigandMultiplicity) + "\n"]
             
             FragmentHeader = BaseHeader + [str(FragmentCharge) + " " + str(FragmentMultiplicity) + "\n"]
-
-            outputfile.writelines(TotalHeader)
+	    #In this first section, (Fragment=1) and (Fragment= str[i]) needs to be removed, as in just remove the fragment stuff.
+            # Writing the first section
+            outputfile.writelines(total_header)
             outputfile.writelines(ligand)
             for fragment in combo:
                 outputfile.writelines(fragment)
             outputfile.write("\n--Link1--\n")
-            outputfile.writelines(FragmentHeader)
+            # Writing the second section with replacements
+            for line in fragment_header:
+                if "(Fragment=1)" in line:
+                    outputfile.write(line.replace("(Fragment=1)", "-Bq"))
+                else:
+                    outputfile.write(line)
             outputfile.writelines(ligand)
             for fragment in combo:
                 outputfile.writelines(fragment)
             outputfile.write("\n--Link1--\n")
-            outputfile.writelines(LigandHeader)
+            # Writing the third section with replacements
+            for line in ligand_header:
+                for i in range(3, k+3, 1):
+                    fragment = f"(Fragment={i})"
+                    if fragment in line:
+                        outputfile.write(line.replace(fragment, "-Bq"))
+                        break
+                else:
+                    outputfile.write(line)
             outputfile.writelines(ligand)
             for fragment in combo:
                 outputfile.writelines(fragment)
             outputfile.writelines("\n")
         
-       counter += 1
+        counter += 1
 
 user_inputs = UserInputs()
 k, N, FileName, Mem, Cores, Functional, BasisSet, CorrSolvent = user_inputs
