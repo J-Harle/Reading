@@ -64,29 +64,29 @@ def Headers(fragment_combinations, ligand, k, N, file_name, mem, cores, function
             total_header = base_header + [str(total_charge) + " " + str(total_multiplicity) + "\n"]
             ligand_header = base_header + [str(ligand_charge) + " " + str(ligand_multiplicity) + "\n"]
             fragment_header = base_header + [str(fragment_charge) + " " + str(fragment_multiplicity) + "\n"]
-	    #w = outputfile.writelines
-		
-            #If N == 1
-	    #w(TotalHeader)
-	    #w(ligand)
-	    #for fragment in combo:
-		#w(fragment)
-	    #w("\n--Link1--\n")
-	    #In this bit, (Fragment=1) needs to be replaced with: -Bq
-	    #w(FragmentHeader)
-	    #w(ligand)
-	    #for fragment in combo:
-		#w(fragment)
-	    #w("\n--Link1--\n")
-	    #In this bit, the (Fragment=x) needs to be replaced with -Bq
-	    #(LigandHeader)
-	    #(ligand)
-	    #for fragment in combo:
-		#w(fragment)
-	    #w("\n--Link1--\n")
 
-
-
+            if N == 1:
+                outputfile.writelines(total_header)
+                outputfile.writelines(ligand)
+                for fragment in combo:
+                    outputfile.writelines(fragment)
+                outputfile.write("\n--Link1--\n")
+                # Modify fragment 1 to -Bq
+                outputfile.writelines(fragment_header)
+                outputfile.writelines(ligand)
+                for fragment in combo:
+                    outputfile.writelines(fragment)
+                outputfile.write("\n--Link1--\n")
+                for i in range(2, k+1):
+                    # Modify fragment i to -Bq
+                    outputfile.writelines(fragment_header)
+                    outputfile.writelines(ligand)
+                    for fragment in combo:
+                        outputfile.writelines(fragment)
+                    outputfile.write("\n--Link1--\n")
+            else:
+                # Handle other cases here
+                pass
 
             counter += 1
 
