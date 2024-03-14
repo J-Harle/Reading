@@ -55,7 +55,7 @@ def Headers(FragmentCombinations, ligand, k, N, FileName, Mem, Cores, Functional
                 "%chk=" + str(counter) + "-New" + ".chk" + "\n",
                 "%mem=" + Mem + "GB" + "\n",
                 "%nprocshared=" + Cores + "\n",
-                "#" + " " + Functional + " " + BasisSet + " " + CorrSolvent + "\n",
+                "#" + " " + Functional + " " + BasisSet + (" " + CorrSolvent if CorrSolvent else "") + "\n",
                 "\n",
                 "MSc Project Code" + "\n",
                 "\n"
