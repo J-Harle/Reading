@@ -54,7 +54,7 @@ def Headers(FragmentCombinations, ligand, UserInputs):
                 "%nprocshared=" + Cores + "\n",
                 "#" + " " + Functional +  " "+ BasisSet + " " + CorrSolvent + "\n",
                 "\n",
-                "Josh Harle" + "\n",
+                "MSc Project Code" + "\n",
 		"\n"
             ]
 
