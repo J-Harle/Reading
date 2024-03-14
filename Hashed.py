@@ -42,7 +42,7 @@ def GenerateCombinations(Fragments, K):
 def Headers(fragment_combinations, ligand, k, N, file_name, mem, cores, functional, basis_set, solvent, corr_solvent):
     counter = 1
     for combo in fragment_combinations:
-        output_file = str(counter) + "-New.com"
+        output_file = str(counter) + "-New.com"  # Unique output file name for each combination
         with open(output_file, "w") as outputfile:
             fragment_charge = 0
             ligand_charge = 0
@@ -88,7 +88,7 @@ def Headers(fragment_combinations, ligand, k, N, file_name, mem, cores, function
                 # Handle other cases here
                 pass
 
-            counter += 1
+        counter += 1
 
 k, N, FileName, Mem, Cores, Functional, BasisSet, Solvent, CorrSolvent = UserInputs()
 ligand, fragment_list = ReadingFile(FileName, k)
