@@ -11,18 +11,19 @@ def UserInputs():
     Functional = input("Which functional would you like to use?: ")
     BasisSet = input("Which basis set would you like to use?: ")
     Solvent = input("Which solvent would you like to use? If none, leave blank: ")
-    
-    if Solvent.lower() == "none" or Solvent == "":
-        CorrSolvent = None
+    CorrSolvent = "SCRF=(Solvent=" + Solvent + ")"
+    Solvent2 = None
+    if Solvent == "None" or "none" or "":
+        CorrSolvent = Solvent2
     else:
-        CorrSolvent = "SCRF=(Solvent=" + Solvent + ")"
-    
+        CorrSolvent = CorrSolvent
     OtherInput = input("Would you like any other commands in the command line? If none, leave blank: ")
-    
-    return k, N, FileName, Mem, Cores, Functional, BasisSet, Solvent, CorrSolvent
+    return k, N, FileName, Mem, Cores, Functional, BasisSet, Solvent
 
 def ReadingFile(FileName, k):
     ligand = []
+    bq_ligand = ligand.stringreplace("(Fragment=" + str(i)+ ")", "-Bq")
+    blank_ligand = bq_ligand.stringreplace("-Bq"," ")
     fragment_list = defaultdict(list)
 
     with open(FileName, 'r') as file:
@@ -34,63 +35,62 @@ def ReadingFile(FileName, k):
                 if fragment in line:
                     fragment_list[i - 1].append(line)
     return ligand, fragment_list
+    bq_fragment_list = fragment_list.stringreplace("(Fragment=" +str(i) + ")", "-Bq")
+    blank_fragment_list = bq_fragment_list.stringreplace("-Bq", " ")
+    return bq_fragment_list, blank_fragment_list, bq_ligand, blank_ligand
 
 def GenerateCombinations(Fragments, K):
     FragmentCombinations = itertools.combinations(Fragments, K)
     return FragmentCombinations
 
-def Headers(fragment_combinations, ligand, k, N, file_name, mem, cores, functional, basis_set, solvent, corr_solvent):
-    counter = 1
-    for combo in fragment_combinations:
-        output_file = str(counter) + "-New.com"
-        with open(output_file, "w") as outputfile:
-            fragment_charge = 0
-            ligand_charge = 0
-            fragment_multiplicity = 1
-            ligand_multiplicity = 1
-            total_charge = fragment_charge + ligand_charge
-            total_multiplicity = max(fragment_multiplicity, ligand_multiplicity)
-
-            base_header = [
+def Headers(FragmentCombinations, ligand, UserInputs):
+    counter = 1  
+    for combo in FragmentCombinations:
+       OutputFile = str(counter) + "-New.com"  
+       with open(OutputFile, "w") as outputfile: 
+            FragmentCharge = 0 
+            LigandCharge = 0    
+            FragmentMultiplicity = 1
+            LigandMultiplicity = 1
+            TotalCharge = FragmentCharge + LigandCharge
+            TotalMultiplicity = max(FragmentMultiplicity, LigandMultiplicity)
+            
+            BaseHeader = [
                 "%chk=" + str(counter) + "-New" + ".chk" + "\n",
-                "%mem=" + mem + "GB" + "\n",
-                "%nprocshared=" + cores + "\n",
-                "#" + " " + functional + " " + basis_set + (" " + corr_solvent if corr_solvent else "") + "\n",
+                "%mem=" + Mem + "GB" + "\n",
+                "%nprocshared=" + Cores + "\n",
+                "#" + " " + Functional +  " "+ BasisSet + " " + CorrSolvent + "\n",
                 "\n",
                 "MSc Project Code" + "\n",
-                "\n"
+		"\n"
             ]
 
-            total_header = base_header + [str(total_charge) + " " + str(total_multiplicity) + "\n"]
-            ligand_header = base_header + [str(ligand_charge) + " " + str(ligand_multiplicity) + "\n"]
-            fragment_header = base_header + [str(fragment_charge) + " " + str(fragment_multiplicity) + "\n"]
+            TotalHeader = BaseHeader + [str(TotalCharge) + " " + str(TotalMultiplicity) + "\n"]
+
+            LigandHeader = BaseHeader + [str(LigandCharge) + " " + str(LigandMultiplicity) + "\n"]
             
-            if N == 1:
-                outputfile.writelines(total_header)
-                outputfile.writelines(ligand)
-                for fragment in combo:
-                    outputfile.writelines(fragment)
-                outputfile.write("\n--Link1--\n")
-                
-                # In this bit, (Fragment=1) needs to be replaced with: -Bq
-                outputfile.writelines(fragment_header)
-                outputfile.writelines(ligand)
-                for fragment in combo:
-                    fragment = [fragment.replace("(Fragment=1)", "-Bq") for fragment in fragment]
-                    outputfile.writelines(fragment)
-                outputfile.write("\n--Link1--\n")
-                
-                # In this bit, the (Fragment=x) needs to be replaced with -Bq
-                outputfile.writelines(ligand_header)
-                outputfile.writelines(ligand)
-                for fragment in combo:
-                    fragment = [fragment.replace("(Fragment=", "-Bq") for fragment in fragment]
-                    outputfile.writelines(fragment)
-                outputfile.write("\n--Link1--\n")
+            FragmentHeader = BaseHeader + [str(FragmentCharge) + " " + str(FragmentMultiplicity) + "\n"]
 
-            counter += 1
+            outputfile.writelines(TotalHeader)
+            outputfile.writelines(blank_ligand)
+            for fragment in combo:
+                outputfile.writelines(blank_fragment)
+            outputfile.write("\n--Link1--\n")
+            outputfile.writelines(FragmentHeader)
+            outputfile.writelines(bq_ligand)
+            for fragment in combo:
+                outputfile.writelines(fragment)
+            outputfile.write("\n--Link1--\n")
+            outputfile.writelines(LigandHeader)
+            outputfile.writelines(ligand)
+            for fragment in combo:
+                outputfile.writelines(bq_fragment)
+            outputfile.writelines("\n")
+        
+       counter += 1
 
-k, N, FileName, Mem, Cores, Functional, BasisSet, Solvent, CorrSolvent = UserInputs()
+user_inputs = UserInputs()
+k, N, FileName, Mem, Cores, Functional, BasisSet, CorrSolvent = user_inputs
 ligand, fragment_list = ReadingFile(FileName, k)
 FragmentCombinations = GenerateCombinations(fragment_list.values(), N)
-Headers(FragmentCombinations, ligand, k, N, FileName, Mem, Cores, Functional, BasisSet, Solvent, CorrSolvent)
+Headers(FragmentCombinations, ligand, user_inputs)
