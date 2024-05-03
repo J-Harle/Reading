@@ -1,4 +1,4 @@
-from collections import defaultdict
+    from collections import defaultdict
 import itertools
 
 def UserInputs():
@@ -66,6 +66,7 @@ def Headers(FragmentCombinations, ligand, user_inputs, bq_ligand, blank_ligand, 
     for combo in FragmentCombinations:
         OutputFile = f"{counter}-New.com"
         with open(OutputFile, "w") as outputfile: 
+            # Would like to have some automatic charge and multiplicity handling
             FragmentCharge = 0 
             LigandCharge = 0    
             FragmentMultiplicity = 1
@@ -89,10 +90,63 @@ def Headers(FragmentCombinations, ligand, user_inputs, bq_ligand, blank_ligand, 
             FragmentHeader = BaseHeader + [f"{FragmentCharge} {FragmentMultiplicity}\n"]
             
             w = outputfile.writelines
+            #4Body interactions:
+            #L + 1 + 2 + 3
+            #L + 1(Bq) + 2 + 3
+            #L + 1(Bq) + 2(Bq) + 3
+            #L + 1(Bq) + 2(Bq) + 3(Bq)
+            #L + 1(Bq) + 2 + 3(Bq)
+            #L + 1 + 2(Bq) + 3
+            #L + 1 + 2(Bq) + 3(Bq)
+            #L + 1 + 2 + 3(Bq)
+            #L(Bq) + 1 + 2 + 3
+            #L(Bq) + 1(Bq) + 2 + 3
+            #L(Bq) + 1(Bq) + 2(Bq) + 3
+            #L(Bq) + 1(Bq) + 2 + 3(Bq)
+            #L(Bq) + 1 + 2(Bq) + 3
+            #L(Bq) + 1 + 2(Bq) + 3(Bq)
+            #L(Bq) + 1 + 2 + 3(Bq)
+
+            #3Body interactions:
+            #L + 1 + 2
+            #L + 1(Bq) + 2
+            #L + 1 + 2(Bq)
+            #L + 1(Bq) + 2(Bq)
+            #L(Bq) + 1(Bq) + 2
+            #L(Bq) + 1 + 2
+            #L(Bq) + 1 + 2 (Bq)
+
+            #L + 1 + 3
+            #L + 1(Bq) + 3
+            #L + 1 + 3(Bq)
+            #L + 1(Bq) + 3(Bq)
+            #L(Bq) + 1(Bq) + 3
+            #L(Bq) + 1 + 3
+            #L(Bq) + 1 + 3(Bq)
+
+            #L + 2 + 3
+            #L + 2(Bq) + 3
+            #L + 2 + 3(Bq)
+            #L + 2(Bq) + 3(Bq)
+            #L(Bq) + 2(Bq) + 3
+            #L(Bq) + 2 + 3
+            #L(Bq) + 2 + 3 (Bq)
+
+            #Pairwise interactions:
+            #L + 1
+            #L(Bq) + 1
+            #L + 1(Bq)
+            #L + 2
+            #L(Bq) + 2
+            #L + 2(Bq)
+            #L + 3
+            #L(Bq) + 3
+            #L + 3(Bq)
+
             counter += 1
 
 user_inputs = UserInputs()
 N, FileName, Mem, Cores, Functional, BasisSet, CorrSolvent = user_inputs
-ligand, bq_ligand, blank_ligand, fragment_list, bq_fragment_list, blank_fragment_list = ReadingFile(FileName, k)
+ligand, bq_ligand, blank_ligand, fragment_list, bq_fragment_list, blank_fragment_list = ReadingFile(FileName, N)
 FragmentCombinations = generate_interactions(fragment_list.keys(), N)
 Headers(FragmentCombinations, ligand, user_inputs, bq_ligand, blank_ligand, bq_fragment_list, blank_fragment_list)
