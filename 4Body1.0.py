@@ -112,25 +112,23 @@ def Headers(FragmentCombinations, ligand, user_inputs, bq_ligand, blank_ligand, 
             #L + 1(Bq) + 2
             #L + 1 + 2(Bq)
             #L + 1(Bq) + 2(Bq)
-            #L(Bq) + 1(Bq) + 2
-            #L(Bq) + 1 + 2
-            #L(Bq) + 1 + 2 (Bq)
-
             #L + 1 + 3
             #L + 1(Bq) + 3
             #L + 1 + 3(Bq)
             #L + 1(Bq) + 3(Bq)
-            #L(Bq) + 1(Bq) + 3
-            #L(Bq) + 1 + 3
-            #L(Bq) + 1 + 3(Bq)
-
             #L + 2 + 3
             #L + 2(Bq) + 3
             #L + 2 + 3(Bq)
             #L + 2(Bq) + 3(Bq)
+            #L(Bq) + 1(Bq) + 2
+            #L(Bq) + 1 + 2
+            #L(Bq) + 1 + 2(Bq)
+            #L(Bq) + 1(Bq) + 3
+            #L(Bq) + 1 + 3
+            #L(Bq) + 1 + 3(Bq)
             #L(Bq) + 2(Bq) + 3
             #L(Bq) + 2 + 3
-            #L(Bq) + 2 + 3 (Bq)
+            #L(Bq) + 2 + 3(Bq)
 
             #Pairwise interactions:
             #L + 1
