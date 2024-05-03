@@ -3,8 +3,8 @@ from collections import defaultdict
 import itertools
 
 def UserInputs():
-    k = int(input("How many amino acids are in the structure?: "))
-    N = int(input("How many amino acids would you like to include in the interaction?: "))
+#    k = int(input("How many amino acids are in the structure?: "))
+     N = int(input("How many amino acids would you like to include in the interaction?: "))
     UnCorrFileName = input("Which file would you like to open? (Do not include .com): ")
     FileName = UnCorrFileName + ".com"
     Mem = str(int(input("How much memory would you like to use (In GB)?: ")))
@@ -12,7 +12,12 @@ def UserInputs():
     Functional = input("Which functional would you like to use?: ")
     BasisSet = input("Which basis set would you like to use?: ")
     Solvent = input("Which solvent would you like to use? If none, leave blank: ")
-    CorrSolvent = "SCRF=(Solvent=" + Solvent + ")" if Solvent else None
+    CorrSolvent = "SCRF=(Solvent=" + Solvent + ")"
+    Solvent2 = None
+    if Solvent == "None" or Solvent == "none" or Solvent == "":
+        CorrSolvent = Solvent2
+    else:
+        CorrSolvent = CorrSolvent
     OtherInput = input("Would you like any other commands in the command line? If none, leave blank: ")
     return k, N, FileName, Mem, Cores, Functional, BasisSet, Solvent
 
@@ -37,23 +42,44 @@ def ReadingFile(FileName, k):
     
     for i in range(1, k+3):
         bq_ligand = [line.replace("(Fragment=" + str(i) + ")", "-Bq") for line in bq_ligand]
-        blank_ligand = [line.replace("(Fragment=" + str(i) + ")", " ") for line in blank_ligand]
-        bq_fragment_list[i - 1] = [line.replace("(Fragment=" + str(i) + ")", "-Bq") for line in bq_fragment_list[i - 1]]
-        blank_fragment_list[i - 1] = [line.replace("(Fragment=" + str(i) + ")", " ") for line in blank_fragment_list[i - 1]]
+        bq_ligand = [line.replace("(Fragment=" + str(i) + ")", "-Bq") for line in ligand]
+        blank_ligand = [line.replace("(Fragment=" + str(i) + ")", " ") for line in ligand]
+        bq_fragment_list[i - 1] += [line.replace("(Fragment=" + str(i) + ")", "-Bq") for line in fragment_list[i - 1]]
+        blank_fragment_list[i - 1] += [line.replace("(Fragment=" + str(i) + ")", " ") for line in fragment_list[i - 1]]
 
     return ligand, bq_ligand, blank_ligand, fragment_list, bq_fragment_list, blank_fragment_list
 
-def GenerateCombinations(Fragments, K):
-    FragmentCombinations = itertools.combinations(Fragments, K)
-    return FragmentCombinations
+def generate_interactions(Fragments, K):
+    # Generate all combinations with the desired length
+    combos = itertools.combinations(Fragments, K)
+    
+    # Initialize sets to store unique interactions
+    FourBodyInteractions = []
+    ThreeBodyInteractions = []
+    PairwiseInteractions = []
+    
+    for combo in combos:
+        #This is hard coded to generate 4 body interactions, but is easily scable
+        four_body_combos = list(itertools.combinations(combo, N))
+        FourBodyInteractions.update(four_body_combos)
+        
+        for four_body_combo in four_body_combos:
+            # Generate all 3-body interactions for the current 4-body combination
+            three_body_combos = list(itertools.combinations(four_body_combo, N-1))
+            ThreeBodyInteractions.update(three_body_combos)
+            
+            # Generate all 2-body interactions for the current 4-body combination
+            pairwise_combos = list(itertools.combinations(four_body_combo, N-2))
+            PairwiseInteractions.update(pairwise_combos)
+    
+    return FourBodyInteractions, ThreeBodyInteractions, PairwiseInteractions
+
 
 def Headers(FragmentCombinations, ligand, user_inputs, bq_ligand, blank_ligand, bq_fragment_list, blank_fragment_list):
     k, N, FileName, Mem, Cores, Functional, BasisSet, CorrSolvent = user_inputs
     counter = 1  
-    
     for combo in FragmentCombinations:
-        OutputFile = f"{combo[0]}_{combo[1]}-New.com"  # Naming convention for files
-        
+        OutputFile = str(counter) + "-New.com"  
         with open(OutputFile, "w") as outputfile: 
             FragmentCharge = 0 
             LigandCharge = 0    
@@ -63,15 +89,14 @@ def Headers(FragmentCombinations, ligand, user_inputs, bq_ligand, blank_ligand, 
             TotalMultiplicity = max(FragmentMultiplicity, LigandMultiplicity)
             
             BaseHeader = [
-                f"%chk={counter}-New.chk\n",
-                f"%mem={Mem}GB\n",
-                f"%nprocshared={Cores}\n",
-                f"#{Functional} {BasisSet} {CorrSolvent}\n",
-                "\n",
-                "MSc Project Code\n",
-                "\n"
-            ]
-
+            f"%chk={counter}-New.chk\n",
+            f"%mem={Mem}GB\n",
+            f"%nprocshared={Cores}\n",
+            f"#{Functional} {BasisSet} {CorrSolvent}\n",
+            "\n",
+            "Josh Harle - MSc Project Code\n",
+            "\n"
+        ]
             TotalHeader = BaseHeader + [f"{TotalCharge} {TotalMultiplicity}\n"]
 
             LigandHeader = BaseHeader + [f"{LigandCharge} {LigandMultiplicity}\n"]
@@ -80,82 +105,10 @@ def Headers(FragmentCombinations, ligand, user_inputs, bq_ligand, blank_ligand, 
             
             w = outputfile.writelines
             
-            # Write the headers and fragments to the file
-            if N == 1:
-                w(TotalHeader)
-                w(blank_ligand)
-                for fragment in combo:
-                    w(blank_fragment_list[fragment - 1])
-                w("\n--Link1--\n")
-                w(FragmentHeader)
-                w(bq_ligand)
-                for fragment in combo:
-                    w(blank_fragment_list[fragment - 1])
-                w("\n--Link1--\n")
-                w(LigandHeader)
-                w(blank_ligand)
-                for fragment in combo:
-                    w(bq_fragment_list[fragment - 1])
-                w("\n")
-            
-            elif N == 2:
-                # Generate combinations of 2 fragments for each combination of 3 fragments
-                fragment_pairs = itertools.combinations(combo, 2)
-                for pair in fragment_pairs:
-                    # Total headers for each combination of 2 fragments
-                    w(TotalHeader)
-                    w(blank_ligand)
-                    for fragment in combo:
-                        w(blank_fragment_list[fragment - 1])
-                    w("\n--Link1--\n")
-                    
-                    # Ligand + Frag1(Bq) + Frag2
-                    w(LigandHeader)
-                    w(blank_ligand)
-                    w(bq_fragment_list[pair[0] - 1])
-                    w(blank_fragment_list[pair[1] - 1])
-                    w("\n--Link1--\n")
-                    
-                    # Ligand + Frag1 + Frag2(Bq)
-                    w(LigandHeader)
-                    w(blank_ligand)
-                    w(blank_fragment_list[pair[0] - 1])
-                    w(bq_fragment_list[pair[1] - 1])
-                    w("\n--Link1--\n")
-                    
-                    # Ligand + Frag1(Bq) + Frag2(Bq)
-                    w(LigandHeader)
-                    w(blank_ligand)
-                    w(bq_fragment_list[pair[0] - 1])
-                    w(bq_fragment_list[pair[1] - 1])
-                    w("\n--Link1--\n")
-                    
-                    # Ligand(Bq) + Frag1 + Frag2
-                    w(FragmentHeader)
-                    w(bq_ligand)
-                    for fragment in combo:
-                        w(blank_fragment_list[fragment - 1])
-                    w("\n--Link1--\n")
-                    
-                    # Ligand(Bq) + Frag1(Bq) + Frag2
-                    w(FragmentHeader)
-                    w(bq_ligand)
-                    w(bq_fragment_list[pair[0] - 1])
-                    w(blank_fragment_list[pair[1] - 1])
-                    w("\n--Link1--\n")
-                    
-                    # Ligand(Bq) + Frag1 + Frag2(Bq)
-                    w(FragmentHeader)
-                    w(bq_ligand)
-                    w(blank_fragment_list[pair[0] - 1])
-                    w(bq_fragment_list[pair[1] - 1])
-                    w("\n--Link1--\n")
-                    
-                    counter += 1
+                counter += 1
        
 user_inputs = UserInputs()
 k, N, FileName, Mem, Cores, Functional, BasisSet, CorrSolvent = user_inputs
 ligand, bq_ligand, blank_ligand, fragment_list, bq_fragment_list, blank_fragment_list = ReadingFile(FileName, k)
 FragmentCombinations = GenerateCombinations(fragment_list.keys(), N)
 Headers(FragmentCombinations, ligand, user_inputs, bq_ligand, blank_ligand, bq_fragment_list, blank_fragment_list)
-
