@@ -29,8 +29,8 @@ def ReadingFile(FileName, k):
 
     bq_ligand = [line.replace("(Fragment=" + str(i) + ")", "-Bq") for line in ligand]
     blank_ligand = [line.replace("(Fragment=" + str(i) + ")", " ") for line in ligand]
-    bq_fragment_list = {key: [line.replace("(Fragment=" + str(key) + ")", "-Bq") for line in fragment_list[key]] for key in fragment_list}
-    blank_fragment_list = {key: [line.replace("(Fragment=" + str(key) + ")", " ") for line in fragment_list[key]] for key in fragment_list}
+    bq_fragment_list = [line.replace("(Fragment=" + str(i) + ")", "-Bq") for line in fragment_list]
+    blank_fragment_list = [line.replace("(Fragment=" + str(i) + ")", " ") for line in fragment_list]
 
     return ligand, bq_ligand, blank_ligand, fragment_list, bq_fragment_list, blank_fragment_list
 
@@ -44,7 +44,6 @@ def generate_interactions(Fragments, N):
     PairwiseInteractions = set()
     
     for combo in combos:
-        # This is hard coded to generate 4 body interactions, but is easily scalable
         four_body_combos = list(itertools.combinations(combo, N))
         FourBodyInteractions.update(four_body_combos)
         
@@ -57,10 +56,15 @@ def generate_interactions(Fragments, N):
             pairwise_combos = list(itertools.combinations(four_body_combo, N-2))
             PairwiseInteractions.update(pairwise_combos)
     
-    return FourBodyInteractions, ThreeBodyInteractions, PairwiseInteractions
+    # Create copies of the interactions lists with fragment numbers replaced with '-Bq'
+    FourBodyBq = [line.replace("(Fragment=" + str(i) + ")", "-Bq") for line in FourBodyInteractions]
+    ThreeBodyBq = [line.replace("(Fragment=" + str(i) + ")", "-Bq") for line in ThreeBodyInteractions]
+    PairwiseBq = [line.replace("(Fragment=" + str(i) + ")", "-Bq") for line in PairwiseInteractions]
+    
+    return FourBodyInteractions, ThreeBodyInteractions, PairwiseInteractions, FourBodyBq, ThreeBodyBq, PairwiseBq
 
 
-def Headers(FragmentCombinations, ligand, user_inputs, bq_ligand, blank_ligand, bq_fragment_list, blank_fragment_list):
+def Headers(FragmentCombinations, ligand, user_inputs, bq_ligand, blank_ligand, bq_fragment_list, blank_fragment_list, FourBodyInteractions, FourBodyBq):
     N, FileName, Mem, Cores, Functional, BasisSet, CorrSolvent = user_inputs
     counter = 1  
     for combo in FragmentCombinations:
@@ -92,13 +96,61 @@ def Headers(FragmentCombinations, ligand, user_inputs, bq_ligand, blank_ligand, 
             w = outputfile.writelines
             #4Body interactions:
             #L + 1 + 2 + 3
-            #L + 1(Bq) + 2 + 3
+            w(TotalHeader)
+            w(blank_ligand)
+            w(list(FourBodyInteractions)[0])
+            w("\n--Link1--\n")
+              
+            #L + 1(Bq) + 2 + 3 
+            w(LigandHeader)
+            w(blank_ligand)
+            w(list(FourBodyBq)[0])
+            w(list(FourBodyInteractions)[0])
+            w("\n--Link1--\n")
+              
             #L + 1(Bq) + 2(Bq) + 3
+            w(LigandHeader)
+            w(blank_ligand)
+            w(list(FourBodyBq)[0])
+            w(list(FourBodyBq)[0])
+            w(list(FourBodyInteractions)[0])
+            w("\n--Link1--\n")
+            
             #L + 1(Bq) + 2(Bq) + 3(Bq)
+            w(LigandHeader)
+            w(blank_ligand)
+            w(list(FourBodyBq)[0])
+            w("\n--Link1--\n")
+              
             #L + 1(Bq) + 2 + 3(Bq)
+            w(LigandHeader)
+            w(blank_ligand)
+            w(list(FourBodyBq)[0])
+            w(list(FourBodyBq)[0])
+            w(list(FourBodyInteractions)[0])
+            w("\n--Link1--\n")
+              
             #L + 1 + 2(Bq) + 3
+            w(LigandHeader)
+            w(blank_ligand)
+            w(list(FourBodyInteractions)[0])
+            w(list(FourBodyBq)[0])
+            w(list(FourBodyBq)[0])
+            w("\n--Link1--\n")
+            
             #L + 1 + 2(Bq) + 3(Bq)
+            w(LigandHeader)
+            w(blank_ligand)
+            w(list(FourBodyInteractions)[0])
+            w(list(FourBodyBq)[0])
+            w("\n--Link1--\n")
+            
             #L + 1 + 2 + 3(Bq)
+            w(LigandHeader)
+            w(blank_ligand)
+            w(list(FourBodyInteractions)[0])
+            w("\n--Link1--\n")
+            
             #L(Bq) + 1 + 2 + 3
             #L(Bq) + 1(Bq) + 2 + 3
             #L(Bq) + 1(Bq) + 2(Bq) + 3
@@ -147,4 +199,5 @@ user_inputs = UserInputs()
 N, FileName, Mem, Cores, Functional, BasisSet, CorrSolvent = user_inputs
 ligand, bq_ligand, blank_ligand, fragment_list, bq_fragment_list, blank_fragment_list = ReadingFile(FileName, N)
 FragmentCombinations = generate_interactions(fragment_list.keys(), N)
-Headers(FragmentCombinations, ligand, user_inputs, bq_ligand, blank_ligand, bq_fragment_list, blank_fragment_list)
+FourBodyInteractions, ThreeBodyInteractions, PairwiseInteractions, FourBodyBq, ThreeBodyBq, PairwiseBq = FragmentCombinations
+Headers(FragmentCombinations, ligand, user_inputs, bq_ligand, blank_ligand, bq_fragment_list, blank_fragment_list, FourBodyInteractions, FourBodyBq)
