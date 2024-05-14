@@ -93,6 +93,8 @@ def Headers(FragmentCombinations, ligand, user_inputs, bq_ligand, blank_ligand, 
             
             FragmentHeader = BaseHeader + [f"{FragmentCharge} {FragmentMultiplicity}\n"]
             
+def WriteFiles(Headers, FragmentCombinations, ligand, user_inputs, bq_ligand, blank_ligand, bq_fragment_list, blank_fragment_list, FourBodyInteractions, FourBodyBq):
+    N, FileName, Mem, Cores, Functional, BasisSet, CorrSolvent = user_inputs):    
             w = outputfile.writelines
             #4Body interactions:
             #L + 1 + 2 + 3
