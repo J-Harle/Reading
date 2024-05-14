@@ -2,7 +2,8 @@
 import itertools
 
 def UserInputs():
-   # N = int(input("How many amino acids would you like to include in the interaction?: ")) (This is hard coded to be 3 at the moment)
+    k = int(input("How many amino acids are in the structure?: "))
+    N = int(input("How many amino acids would you like to include in the interaction?: "))
     UnCorrFileName = input("Which file would you like to open? (Do not include .com): ")
     FileName = UnCorrFileName + ".com"
     Mem = str(int(input("How much memory would you like to use (In GB)?: ")))
@@ -44,17 +45,16 @@ def generate_interactions(Fragments, N):
     PairwiseInteractions = set()
     
     for combo in combos:
-        four_body_combos = list(itertools.combinations(combo, 3))
+        four_body_combos = list(list(itertools.combinations(combo, 3)))
         FourBodyInteractions.update(four_body_combos)
-        FB1, FB2, FB3 = four_body_combinations[i]
         
         for four_body_combo in four_body_combos:
             # Generate all 3-body interactions for the current 4-body combination
-            three_body_combos = list(itertools.combinations(four_body_combo, 2))
+            three_body_combos = list(list(itertools.combinations(four_body_combo, 2)))
             ThreeBodyInteractions.update(three_body_combos)
             
-            # Generate all 2-body interactions for the current 3-body combination
-            pairwise_combos = list(itertools.combinations(three_body_combo, 1))
+            # Generate all 2-body interactions for the current 4-body combination
+            pairwise_combos = list(list(itertools.combinations(four_body_combo, 1)))
             PairwiseInteractions.update(pairwise_combos)
     
     # Create copies of the interactions lists with fragment numbers replaced with '-Bq'
@@ -97,7 +97,6 @@ def Headers(FragmentCombinations, ligand, user_inputs, bq_ligand, blank_ligand, 
 def WriteFiles(Headers, FragmentCombinations, ligand, user_inputs, bq_ligand, blank_ligand, bq_fragment_list, blank_fragment_list, FourBodyInteractions, FourBodyBq):
     N, FileName, Mem, Cores, Functional, BasisSet, CorrSolvent = user_inputs):    
             w = outputfile.writelines
-           
             #4Body interactions:
             #L + 1 + 2 + 3
             w(TotalHeader)
@@ -119,13 +118,7 @@ def WriteFiles(Headers, FragmentCombinations, ligand, user_inputs, bq_ligand, bl
             w(list(FourBodyBq)[0])
             w(list(FourBodyInteractions)[0])
             w("\n--Link1--\n")
-            
-            #L + 1(Bq) + 2(Bq) + 3(Bq)
-            w(LigandHeader)
-            w(blank_ligand)
-            w(list(FourBodyBq)[0])
-            w("\n--Link1--\n")
-              
+
             counter += 1
 
 user_inputs = UserInputs()
