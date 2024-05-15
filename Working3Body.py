@@ -1,4 +1,3 @@
-
 from collections import defaultdict
 import itertools
 
@@ -29,7 +28,7 @@ def ReadingFile(FileName, k):
                 if fragment in line:
                     fragment_list[i - 1].append(line)
 
-    # Create copies of ligand a fragment lists then line.replace
+    # Create copies of ligand and fragment lists then line.replace
     bq_ligand = ligand.copy()
     blank_ligand = ligand.copy()
     bq_fragment_list = fragment_list.copy()
@@ -78,91 +77,90 @@ def Headers(FragmentCombinations, ligand, user_inputs, bq_ligand, blank_ligand, 
             
             w = outputfile.writelines
             
-                # Ligand + Frag1 + Frag2
-                w(TotalHeader)
-                w(blank_ligand)
-                for fragment in combo:
-                    w(blank_fragment_list[fragment - 1])
-                w("\n--Link1--\n")
-                
-                # Ligand + Frag1(Bq) + Frag2
-                w(LigandHeader)
-                w(blank_ligand)
-                w(bq_fragment_list[combo[0] - 1])
-                w(blank_fragment_list[combo[1] - 1])
-                w("\n--Link1--\n")
-                
-                # Ligand + Frag1 + Frag2(Bq)
-                w(LigandHeader)
-                w(blank_ligand)
-                w(blank_fragment_list[combo[0] - 1])
-                w(bq_fragment_list[combo[1] - 1])
-                w("\n--Link1--\n")
-                
-                # Ligand + Frag1(Bq) + Frag2(Bq)
-                w(LigandHeader)
-                w(blank_ligand)
-                w(bq_fragment_list[combo[0] - 1])
-                w(bq_fragment_list[combo[1] - 1])
-                w("\n--Link1--\n")
-                
-                # Ligand(Bq) + Frag1 + Frag2
-                w(FragmentHeader)
-                w(bq_ligand)
-                for fragment in combo:
-                    w(blank_fragment_list[fragment - 1])
-                w("\n--Link1--\n")
-                
-                # Ligand(Bq) + Frag1(Bq) + Frag2
-                w(FragmentHeader)
-                w(bq_ligand)
-                w(bq_fragment_list[combo[0] - 1])
-                w(blank_fragment_list[combo[1] - 1])
-                w("\n--Link1--\n")
-                
-                # Ligand(Bq) + Frag1 + Frag2(Bq)
-                w(FragmentHeader)
-                w(bq_ligand)
-                w(blank_fragment_list[combo[0] - 1])
-                w(bq_fragment_list[combo[1] - 1])
-                w("\n--Link1--\n")
+            # Ligand + Frag1 + Frag2
+            w(TotalHeader)
+            w(blank_ligand)
+            for fragment in combo:
+                w(blank_fragment_list[fragment - 1])
+            w("\n--Link1--\n")
+            
+            # Ligand + Frag1(Bq) + Frag2
+            w(LigandHeader)
+            w(blank_ligand)
+            w(bq_fragment_list[combo[0] - 1])
+            w(blank_fragment_list[combo[1] - 1])
+            w("\n--Link1--\n")
+            
+            # Ligand + Frag1 + Frag2(Bq)
+            w(LigandHeader)
+            w(blank_ligand)
+            w(blank_fragment_list[combo[0] - 1])
+            w(bq_fragment_list[combo[1] - 1])
+            w("\n--Link1--\n")
+            
+            # Ligand + Frag1(Bq) + Frag2(Bq)
+            w(LigandHeader)
+            w(blank_ligand)
+            w(bq_fragment_list[combo[0] - 1])
+            w(bq_fragment_list[combo[1] - 1])
+            w("\n--Link1--\n")
+            
+            # Ligand(Bq) + Frag1 + Frag2
+            w(FragmentHeader)
+            w(bq_ligand)
+            for fragment in combo:
+                w(blank_fragment_list[fragment - 1])
+            w("\n--Link1--\n")
+            
+            # Ligand(Bq) + Frag1(Bq) + Frag2
+            w(FragmentHeader)
+            w(bq_ligand)
+            w(bq_fragment_list[combo[0] - 1])
+            w(blank_fragment_list[combo[1] - 1])
+            w("\n--Link1--\n")
+            
+            # Ligand(Bq) + Frag1 + Frag2(Bq)
+            w(FragmentHeader)
+            w(bq_ligand)
+            w(blank_fragment_list[combo[0] - 1])
+            w(bq_fragment_list[combo[1] - 1])
+            w("\n--Link1--\n")
 
             # Also need to do both 2 body interactions for each Fragment:
-# First Fragment:
-w(TotalHeader)
-w(blank_ligand)
-for fragment in combo:
-    w(blank_fragment_list[fragment - 1])
-    w("\n--Link1--\n")
-    w(FragmentHeader)
-    w(bq_ligand)
-    w(blank_fragment_list[fragment - 1])
-    w("\n--Link1--\n")
-    w(LigandHeader)
-    w(blank_ligand)
-    w(bq_fragment_list[fragment - 1])
-    w("\n")
+            # First Fragment:
+            w(TotalHeader)
+            w(blank_ligand)
+            for fragment in combo:
+                w(blank_fragment_list[fragment - 1])
+                w("\n--Link1--\n")
+                w(FragmentHeader)
+                w(bq_ligand)
+                w(blank_fragment_list[fragment - 1])
+                w("\n--Link1--\n")
+                w(LigandHeader)
+                w(blank_ligand)
+                w(bq_fragment_list[fragment - 1])
+                w("\n")
 
-# Second Fragment:
-w(TotalHeader)
-w(blank_ligand)
-for fragment in combo:
-    w(blank_fragment_list[fragment - 2])
-    w("\n--Link1--\n")
-    w(FragmentHeader)
-    w(bq_ligand)
-    w(blank_fragment_list[fragment - 2])
-    w("\n--Link1--\n")
-    w(LigandHeader)
-    w(blank_ligand)
-    w(bq_fragment_list[fragment - 2])
-    w("\n")
+            # Second Fragment:
+            w(TotalHeader)
+            w(blank_ligand)
+            for fragment in combo:
+                w(blank_fragment_list[fragment - 2])
+                w("\n--Link1--\n")
+                w(FragmentHeader)
+                w(bq_ligand)
+                w(blank_fragment_list[fragment - 2])
+                w("\n--Link1--\n")
+                w(LigandHeader)
+                w(blank_ligand)
+                w(bq_fragment_list[fragment - 2])
+                w("\n")
             
-                counter += 1
-       
+        counter += 1
+
 user_inputs = UserInputs()
 k, N, FileName, Mem, Cores, Functional, BasisSet, CorrSolvent = user_inputs
 ligand, bq_ligand, blank_ligand, fragment_list, bq_fragment_list, blank_fragment_list = ReadingFile(FileName, k)
 FragmentCombinations = GenerateCombinations(fragment_list.keys(), N)
 Headers(FragmentCombinations, ligand, user_inputs, bq_ligand, blank_ligand, bq_fragment_list, blank_fragment_list)
-
