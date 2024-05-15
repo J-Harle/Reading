@@ -12,7 +12,7 @@ def UserInputs():
     Functional = input("Which functional would you like to use?: ")
     BasisSet = input("Which basis set would you like to use?: ")
     Solvent = input("Which solvent would you like to use? If none, leave blank: ")
-    CorrSolvent = "SCRF=(Solvent=" + Solvent + ")"
+    CorrSolvent = f"SCRF=(Solvent={Solvent})" if Solvent.lower() != "none" else ""
     Solvent2 = None
     if Solvent == "None" or Solvent == "none" or Solvent == "":
         CorrSolvent = Solvent2
@@ -83,24 +83,6 @@ def Headers(FragmentCombinations, ligand, user_inputs, bq_ligand, blank_ligand, 
             
             w = outputfile.writelines
             
-            if N == 1:
-                w(TotalHeader)
-                w(blank_ligand)
-                for fragment in combo:
-                    w(blank_fragment_list[fragment - 1])
-                w("\n--Link1--\n")
-                w(FragmentHeader)
-                w(bq_ligand)
-                for fragment in combo:
-                    w(blank_fragment_list[fragment - 1])
-                w("\n--Link1--\n")
-                w(LigandHeader)
-                w(blank_ligand)
-                for fragment in combo:
-                    w(bq_fragment_list[fragment - 1])
-                w("\n")
-            
-            elif N == 2:
                 # Ligand + Frag1 + Frag2
                 w(TotalHeader)
                 w(blank_ligand)
@@ -150,13 +132,6 @@ def Headers(FragmentCombinations, ligand, user_inputs, bq_ligand, blank_ligand, 
                 w(bq_fragment_list[combo[1] - 1])
                 w("\n--Link1--\n")
 
-            # Also need to do both 2 body interactions for each Fragment:
-            # First Fragment:
-                w(TotalHeader)
-                w(blank_ligand)
-                for fragment in combo:
-                    w(blank_fragment_list[fragment - 1])
-                w("\n--Link1--\n")
             # Also need to do both 2 body interactions for each Fragment:
             # First Fragment:
                 w(TotalHeader)
