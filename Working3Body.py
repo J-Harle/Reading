@@ -128,39 +128,35 @@ def Headers(FragmentCombinations, ligand, user_inputs, bq_ligand, blank_ligand, 
                 w("\n--Link1--\n")
 
             # Also need to do both 2 body interactions for each Fragment:
-            # First Fragment:
-                w(TotalHeader)
-                w(blank_ligand)
-                for fragment in combo:
-                    w(blank_fragment_list[fragment - 1])
-                w("\n--Link1--\n")
-                w(FragmentHeader)
-                w(bq_ligand)
-                for fragment in combo:
-                    w(blank_fragment_list[fragment - 1])
-                w("\n--Link1--\n")
-                w(LigandHeader)
-                w(blank_ligand)
-                for fragment in combo:
-                    w(bq_fragment_list[fragment - 1])
-                w("\n")
+# First Fragment:
+w(TotalHeader)
+w(blank_ligand)
+for fragment in combo:
+    w(blank_fragment_list[fragment - 1])
+    w("\n--Link1--\n")
+    w(FragmentHeader)
+    w(bq_ligand)
+    w(blank_fragment_list[fragment - 1])
+    w("\n--Link1--\n")
+    w(LigandHeader)
+    w(blank_ligand)
+    w(bq_fragment_list[fragment - 1])
+    w("\n")
 
-            # Second Fragment:
-                w(TotalHeader)
-                w(blank_ligand)
-                for fragment in combo:
-                    w(blank_fragment_list[fragment - 2])
-                w("\n--Link1--\n")
-                w(FragmentHeader)
-                w(bq_ligand)
-                for fragment in combo:
-                    outputfile.writelines(blank_fragment_list[fragment - 2])
-                w("\n--Link1--\n")
-                w(LigandHeader)
-                w(blank_ligand)
-                for fragment in combo:
-                    w(bq_fragment_list[fragment - 2])
-                w("\n")
+# Second Fragment:
+w(TotalHeader)
+w(blank_ligand)
+for fragment in combo:
+    w(blank_fragment_list[fragment - 2])
+    w("\n--Link1--\n")
+    w(FragmentHeader)
+    w(bq_ligand)
+    w(blank_fragment_list[fragment - 2])
+    w("\n--Link1--\n")
+    w(LigandHeader)
+    w(blank_ligand)
+    w(bq_fragment_list[fragment - 2])
+    w("\n")
             
                 counter += 1
        
