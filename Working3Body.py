@@ -5,7 +5,7 @@ def UserInputs():
     k = int(input("How many amino acids are in the structure?: "))
     N = int(input("How many amino acids would you like to include in the interaction?: "))
     UnCorrFileName = input("Which file would you like to open? (Do not include .com): ")
-    FileName = UnCorrFileName + ".com"
+    FileName = f"{UnCorrFileName}.com"
     Mem = str(int(input("How much memory would you like to use (In GB)?: ")))
     Cores = str(int(input("How many cores would you like to use?: ")))
     Functional = input("Which functional would you like to use?: ")
@@ -24,7 +24,7 @@ def ReadingFile(FileName, k):
             if "(Fragment=1)" in line:
                 ligand.append(line)
             for i in range(3, k+3, 1): # k+3 as first fragment is ligand and there is no fragment 2
-                fragment = "Fragment=" + str(i)
+                fragment = f"Fragment={i}"
                 if fragment in line:
                     fragment_list[i - 1].append(line)
 
@@ -35,10 +35,10 @@ def ReadingFile(FileName, k):
     blank_fragment_list = fragment_list.copy()
     
     for i in range(1, k+3):
-        bq_ligand = [line.replace("(Fragment=" + str(i) + ")", "-Bq") for line in bq_ligand]
-        blank_ligand = [line.replace("(Fragment=" + str(i) + ")", " ") for line in blank_ligand]
-        bq_fragment_list[i - 1] = [line.replace("(Fragment=" + str(i) + ")", "-Bq") for line in bq_fragment_list[i - 1]]
-        blank_fragment_list[i - 1] = [line.replace("(Fragment=" + str(i) + ")", " ") for line in blank_fragment_list[i - 1]]
+        bq_ligand = [line.replace(f"(Fragment={i})", "-Bq") for line in bq_ligand]
+        blank_ligand = [line.replace(f"(Fragment={i})", " ") for line in blank_ligand]
+        bq_fragment_list[i - 1] = [line.replace(f"(Fragment={i})", "-Bq") for line in bq_fragment_list[i - 1]]
+        blank_fragment_list[i - 1] = [line.replace(f"(Fragment={i})", " ") for line in blank_fragment_list[i - 1]]
 
     return ligand, bq_ligand, blank_ligand, fragment_list, bq_fragment_list, blank_fragment_list
 
@@ -50,7 +50,7 @@ def Headers(FragmentCombinations, ligand, user_inputs, bq_ligand, blank_ligand, 
     k, N, FileName, Mem, Cores, Functional, BasisSet, CorrSolvent = user_inputs
     counter = 1  
     for combo in FragmentCombinations:
-        OutputFile = str(counter) + "-New.com"  
+        OutputFile = f"{counter}-New.com"  
         with open(OutputFile, "w") as outputfile: 
             FragmentCharge = 0 
             LigandCharge = 0    
@@ -60,20 +60,20 @@ def Headers(FragmentCombinations, ligand, user_inputs, bq_ligand, blank_ligand, 
             TotalMultiplicity = max(FragmentMultiplicity, LigandMultiplicity)
             
             BaseHeader = [
-                "%chk=" + str(counter) + "-New" + ".chk" + "\n",
-                "%mem=" + Mem + "GB" + "\n",
-                "%nprocshared=" + Cores + "\n",
-                "#" + " " + Functional +  " "+ BasisSet + " " + CorrSolvent + "\n",
+                f"%chk={counter}-New.chk\n",
+                f"%mem={Mem}GB\n",
+                f"%nprocshared={Cores}\n",
+                f"#{Functional} {BasisSet} {CorrSolvent}\n",
                 "\n",
-                "MSc Project Code" + "\n",
+                "MSc Project Code\n",
                 "\n"
             ]
 
-            TotalHeader = BaseHeader + [str(TotalCharge) + " " + str(TotalMultiplicity) + "\n"]
+            TotalHeader = BaseHeader + [f"{TotalCharge} {TotalMultiplicity}\n"]
 
-            LigandHeader = BaseHeader + [str(LigandCharge) + " " + str(LigandMultiplicity) + "\n"]
+            LigandHeader = BaseHeader + [f"{LigandCharge} {LigandMultiplicity}\n"]
             
-            FragmentHeader = BaseHeader + [str(FragmentCharge) + " " + str(FragmentMultiplicity) + "\n"]
+            FragmentHeader = BaseHeader + [f"{FragmentCharge} {FragmentMultiplicity}\n"]
             
             w = outputfile.writelines
             
