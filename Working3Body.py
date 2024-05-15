@@ -13,13 +13,8 @@ def UserInputs():
     BasisSet = input("Which basis set would you like to use?: ")
     Solvent = input("Which solvent would you like to use? If none, leave blank: ")
     CorrSolvent = f"SCRF=(Solvent={Solvent})" if Solvent.lower() != "none" else ""
-    Solvent2 = None
-    if Solvent == "None" or Solvent == "none" or Solvent == "":
-        CorrSolvent = Solvent2
-    else:
-        CorrSolvent = CorrSolvent
     OtherInput = input("Would you like any other commands in the command line? If none, leave blank: ")
-    return k, N, FileName, Mem, Cores, Functional, BasisSet, Solvent
+    return N, FileName, Mem, Cores, Functional, BasisSet, CorrSolvent
 
 def ReadingFile(FileName, k):
     ligand = []
