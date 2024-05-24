@@ -197,15 +197,6 @@ def Headers(FragmentCombinations, ligand, user_inputs, bq_ligand, blank_ligand, 
             w(blank_fragment_list[combo[0] - 1])
             w(bq_fragment_list[combo[1] - 1])
             w(bq_fragment_list[combo[2] - 1])
-            w("\n--Link1--\n")
-
-            # Ligand(Bq) + Frag1(Bq) + Frag2(Bq) + Frag3(Bq)
-            w(FragmentHeader)
-            w(bq_ligand)
-            w(bq_fragment_list[combo[0] - 1])
-            w(bq_fragment_list[combo[1] - 1])
-            w(bq_fragment_list[combo[2] - 1])
-            w("\n--Link1--\n")
           
         counter += 1
 
