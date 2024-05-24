@@ -23,15 +23,20 @@ def ReadingFile(FileName, k):
         for line in file:
             if "(Fragment=1)" in line:
                 ligand.append(line)
-            for i in range(3, k+3, 1): # k+3 as first fragment is ligand and there is no fragment 2
+            for i in range(3, k+3):
                 fragment = "Fragment=" + str(i)
                 if fragment in line:
                     fragment_list[i - 1].append(line)
 
-    bq_ligand = [line.replace("(Fragment=" + str(i) + ")", "-Bq") for line in ligand]
-    blank_ligand = [line.replace("(Fragment=" + str(i) + ")", " ") for line in ligand]
-    bq_fragment_list = [line.replace("(Fragment=" + str(i) + ")", "-Bq") for line in fragment_list]
-    blank_fragment_list = [line.replace("(Fragment=" + str(i) + ")", " ") for line in fragment_list]
+    bq_ligand = [line.replace("(Fragment=1)", "-Bq") for line in ligand]
+    blank_ligand = [line.replace("(Fragment=1)", " ") for line in ligand]
+    
+    bq_fragment_list = {}
+    blank_fragment_list = {}
+    
+    for key, lines in fragment_list.items():
+        bq_fragment_list[key] = [line.replace(f"(Fragment={key + 1})", "-Bq") for line in lines]
+        blank_fragment_list[key] = [line.replace(f"(Fragment={key + 1})", " ") for line in lines]
 
     return ligand, bq_ligand, blank_ligand, fragment_list, bq_fragment_list, blank_fragment_list
 
