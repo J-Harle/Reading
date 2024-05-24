@@ -56,7 +56,6 @@ def Headers(FragmentCombinations, ligand, user_inputs, bq_ligand, blank_ligand, 
     counter = 1  
 
     for combo in FragmentCombinations:
-        CuFound = False  # Flag to track if Cu is found in any form
         FragmentCharge = 0  # Initialize charge and multiplicity
         FragmentMultiplicity = 1
 
@@ -64,18 +63,12 @@ def Headers(FragmentCombinations, ligand, user_inputs, bq_ligand, blank_ligand, 
         for fragment_index in combo:
             fragment_lines = blank_fragment_list[fragment_index - 1]
             for line in fragment_lines:
-                if re.search(r'(?<!\w)Cu(?!\w)', line):  # Detect Cu
+                if re.search(r'(?<!\w)Cu(?!\-Bq)(?!\w)', line):  # Detect Cu but not Cu-Bq
                     FragmentCharge = 2
                     FragmentMultiplicity = 2
-                    CuFound = True
-                    break  # Exit the inner loop if Cu is found, but continue to check other fragments
                 elif re.search(r'(?<!\w)Cu-Bq(?!\w)', line):  # Detect Cu-Bq
                     FragmentCharge = 0
                     FragmentMultiplicity = 1
-                    CuFound = True
-                    break  # Exit the inner loop if Cu-Bq is found, but continue to check other fragments
-
-        # If neither Cu nor Cu-Bq is found in the current fragment, the charge and multiplicity remain unchanged
 
         TotalCharge = FragmentCharge  # Assume ligand charge is 0 for now
         TotalMultiplicity = FragmentMultiplicity
