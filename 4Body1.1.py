@@ -59,7 +59,7 @@ def Headers(FragmentCombinations, ligand, user_inputs, bq_ligand, blank_ligand, 
         TotalCharge = 0
         TotalMultiplicity = 1
 
-        for section in range(1, 16):  # Assuming 15 sections
+        for section in range(1, 2**N):  # Assuming 15 sections
             section_charge = 0
             section_multiplicity = 1
 
