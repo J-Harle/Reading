@@ -13,7 +13,7 @@ def UserInputs():
     Solvent = input("Which solvent would you like to use? If none, leave blank: ")
     CorrSolvent = f"SCRF=(Solvent={Solvent})" if Solvent.lower() != "none" else ""
     OtherInput = input("Would you like any other commands in the command line? If none, leave blank: ")
-    return N, FileName, Mem, Cores, Functional, BasisSet, CorrSolvent
+    return k, N, FileName, Mem, Cores, Functional, BasisSet, CorrSolvent
 
 def ReadingFile(FileName, k):
     ligand = []
