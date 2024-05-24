@@ -1,3 +1,4 @@
+import re
 from collections import defaultdict
 import itertools
 
@@ -35,14 +36,14 @@ def ReadingFile(FileName, k):
     # Create copies of ligand and fragment lists then line.replace
     bq_ligand = ligand.copy()
     blank_ligand = ligand.copy()
-    bq_fragment_list = fragment_list.copy()
-    blank_fragment_list = fragment_list.copy()
+    bq_fragment_list = defaultdict(list)
+    blank_fragment_list = defaultdict(list)
     
     for i in range(1, k+3):
         bq_ligand = [line.replace(f"(Fragment={i})", "-Bq") for line in bq_ligand]
         blank_ligand = [line.replace(f"(Fragment={i})", " ") for line in blank_ligand]
-        bq_fragment_list[i - 1] = [line.replace(f"(Fragment={i})", "-Bq") for line in bq_fragment_list[i - 1]]
-        blank_fragment_list[i - 1] = [line.replace(f"(Fragment={i})", " ") for line in blank_fragment_list[i - 1]]
+        bq_fragment_list[i - 1] = [line.replace(f"(Fragment={i})", "-Bq") for line in fragment_list[i - 1]]
+        blank_fragment_list[i - 1] = [line.replace(f"(Fragment={i})", " ") for line in fragment_list[i - 1]]
 
     return ligand, bq_ligand, blank_ligand, fragment_list, bq_fragment_list, blank_fragment_list
 
@@ -53,38 +54,25 @@ def GenerateCombinations(Fragments, K):
 def Headers(FragmentCombinations, ligand, user_inputs, bq_ligand, blank_ligand, bq_fragment_list, blank_fragment_list):
     k, N, FileName, Mem, Cores, Functional, BasisSet, CorrSolvent = user_inputs
     counter = 1  
+
     for combo in FragmentCombinations:
+        # Determine charge and multiplicity for the combination
+        FragmentCharge = 0 
+        FragmentMultiplicity = 1
+
+        # Loop through fragments in the combination to detect Cu and set charge/multiplicity
+        for fragment_index in combo:
+            for line in blank_fragment_list[fragment_index - 1]:
+                if re.search(r'(?<!\w)Cu(?!\-Bq)(?!\w)', line):
+                    FragmentCharge = 2
+                    FragmentMultiplicity = 2
+                    break  # Stop checking further lines in the current fragment
+
+        TotalCharge = FragmentCharge  # Assume ligand charge is 0 for now
+        TotalMultiplicity = FragmentMultiplicity
+
         OutputFile = f"{counter}-New.com"  
         with open(OutputFile, "w") as outputfile: 
-            FragmentCharge = 0 
-            LigandCharge = 0    
-            FragmentMultiplicity = 1
-            LigandMultiplicity = 1
-            TotalCharge = FragmentCharge + LigandCharge
-            TotalMultiplicity = max(FragmentMultiplicity, LigandMultiplicity)
-            
-            # Variables to keep track of original charge and multiplicity
-            original_charge = FragmentCharge
-            original_multiplicity = FragmentMultiplicity
-
-            # Loop through fragments in the combination
-            for fragment_index in combo:
-                # Process lines of the fragment
-                for line in blank_fragment_list[fragment_index - 1]:
-                    # Detect Cu in the line but not Cu-Bq
-                    if re.search(r'(?<!\w)Cu(?!\-Bq)(?!\w)', line):
-                        FragmentCharge = 2
-                        FragmentMultiplicity = 2
-                        # Reset original charge and multiplicity
-                        original_charge = FragmentCharge
-                        original_multiplicity = FragmentMultiplicity
-                    elif re.search(r'(?<!\w)Cu-Bq(?!\w)', line):  # Cu-Bq detected
-                        FragmentCharge = 0
-                        FragmentMultiplicity = 1
-                        # Reset to original charge and multiplicity
-                        FragmentCharge = original_charge
-                        FragmentMultiplicity = original_multiplicity
-            
             BaseHeader = [
                 f"%chk={counter}-New.chk\n",
                 f"%mem={Mem}GB\n",
@@ -97,7 +85,7 @@ def Headers(FragmentCombinations, ligand, user_inputs, bq_ligand, blank_ligand, 
 
             TotalHeader = BaseHeader + [f"{TotalCharge} {TotalMultiplicity}\n"]
 
-            LigandHeader = BaseHeader + [f"{LigandCharge} {LigandMultiplicity}\n"]
+            LigandHeader = BaseHeader + ["0 1\n"]
             
             FragmentHeader = BaseHeader + [f"{FragmentCharge} {FragmentMultiplicity}\n"]
             
