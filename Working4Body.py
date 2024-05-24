@@ -197,6 +197,7 @@ def Headers(FragmentCombinations, ligand, user_inputs, bq_ligand, blank_ligand, 
             w(blank_fragment_list[combo[0] - 1])
             w(bq_fragment_list[combo[1] - 1])
             w(bq_fragment_list[combo[2] - 1])
+            w("\n)
           
         counter += 1
 
