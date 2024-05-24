@@ -79,6 +79,7 @@ def Headers(FragmentCombinations, ligand, user_inputs, bq_ligand, blank_ligand, 
 
             TotalCharge = max(TotalCharge, section_charge)
             TotalMultiplicity = max(TotalMultiplicity, section_multiplicity)
+        
         OutputFile = f"{counter}-New.com"  
         with open(OutputFile, "w") as outputfile: 
             BaseHeader = [
