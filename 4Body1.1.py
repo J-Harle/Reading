@@ -54,24 +54,31 @@ def GenerateCombinations(Fragments, K):
 def Headers(FragmentCombinations, ligand, user_inputs, bq_ligand, blank_ligand, bq_fragment_list, blank_fragment_list):
     k, N, FileName, Mem, Cores, Functional, BasisSet, CorrSolvent = user_inputs
     counter = 1  
-
+    
     for combo in FragmentCombinations:
-    # Loop through fragments in the combination
-        for fragment_index in combo:
-        # Initialize charge and multiplicity for each fragment
-            FragmentCharge = 0 
-         FragmentMultiplicity = 1
+        TotalCharge = 0
+        TotalMultiplicity = 1
 
-        # Loop through lines in the current fragment
-            for line in blank_fragment_list[fragment_index - 1]:
-                if re.search(r'(?<!\w)Cu(?!\-Bq)(?!\w)', line):
-                # Update charge and multiplicity if "Cu" is found
-                    FragmentCharge = 2
-                    FragmentMultiplicity = 2
+        for section in range(1, 16):  # Assuming 15 sections
+            section_charge = 0
+            section_multiplicity = 1
 
-            TotalCharge = FragmentCharge  # Assume ligand charge is 0 for now
-            TotalMultiplicity = FragmentMultiplicity
+            # Check each fragment in the combination for the current section
+            for fragment_index in combo:
+                for line in blank_fragment_list[fragment_index - 1]:
+                    if "--Link1--" in line:
+                        break  # Move to the next section
+                    if "Cu-Bq" in line:
+                        section_charge = 0
+                        section_multiplicity = 1
+                        break  # No need to check further, found Cu-Bq
+                    elif "Cu" in line:
+                        section_charge = 2
+                        section_multiplicity = 2
+                        break  # No need to check further, found Cu
 
+            TotalCharge = max(TotalCharge, section_charge)
+            TotalMultiplicity = max(TotalMultiplicity, section_multiplicity)
         OutputFile = f"{counter}-New.com"  
         with open(OutputFile, "w") as outputfile: 
             BaseHeader = [
