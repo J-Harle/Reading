@@ -57,21 +57,25 @@ def Headers(FragmentCombinations, ligand, user_inputs, bq_ligand, blank_ligand, 
 
     for combo in FragmentCombinations:
         CuFound = False  # Flag to track if Cu is found in any form
+        FragmentCharge = 0  # Initialize charge and multiplicity
+        FragmentMultiplicity = 1
 
         # Loop through fragments in the combination to detect Cu and set charge/multiplicity
         for fragment_index in combo:
             fragment_lines = blank_fragment_list[fragment_index - 1]
             for line in fragment_lines:
-                if re.search(r'(?<!\w)Cu(?!\-Bq)(?!\w)', line):  # Detect Cu
+                if re.search(r'(?<!\w)Cu(?!\w)', line):  # Detect Cu
                     FragmentCharge = 2
                     FragmentMultiplicity = 2
                     CuFound = True
-                    break  # Stop checking further lines in the current fragment
+                    break  # Exit the inner loop if Cu is found, but continue to check other fragments
+                elif re.search(r'(?<!\w)Cu-Bq(?!\w)', line):  # Detect Cu-Bq
+                    FragmentCharge = 0
+                    FragmentMultiplicity = 1
+                    CuFound = True
+                    break  # Exit the inner loop if Cu-Bq is found, but continue to check other fragments
 
-        # Reset to original charge and multiplicity if Cu is not found
-        if not CuFound:
-            FragmentCharge = 0
-            FragmentMultiplicity = 1
+        # If neither Cu nor Cu-Bq is found in the current fragment, the charge and multiplicity remain unchanged
 
         TotalCharge = FragmentCharge  # Assume ligand charge is 0 for now
         TotalMultiplicity = FragmentMultiplicity
@@ -89,9 +93,7 @@ def Headers(FragmentCombinations, ligand, user_inputs, bq_ligand, blank_ligand, 
             ]
 
             TotalHeader = BaseHeader + [f"{TotalCharge} {TotalMultiplicity}\n"]
-
             LigandHeader = BaseHeader + ["0 1\n"]
-            
             FragmentHeader = BaseHeader + [f"{FragmentCharge} {FragmentMultiplicity}\n"]
             
             w = outputfile.writelines
