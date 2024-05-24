@@ -56,20 +56,21 @@ def Headers(FragmentCombinations, ligand, user_inputs, bq_ligand, blank_ligand, 
     counter = 1  
 
     for combo in FragmentCombinations:
-        # Determine charge and multiplicity for the combination
-        FragmentCharge = 0 
-        FragmentMultiplicity = 1
-
-        # Loop through fragments in the combination to detect Cu and set charge/multiplicity
+    # Loop through fragments in the combination
         for fragment_index in combo:
+        # Initialize charge and multiplicity for each fragment
+            FragmentCharge = 0 
+         FragmentMultiplicity = 1
+
+        # Loop through lines in the current fragment
             for line in blank_fragment_list[fragment_index - 1]:
                 if re.search(r'(?<!\w)Cu(?!\-Bq)(?!\w)', line):
+                # Update charge and multiplicity if "Cu" is found
                     FragmentCharge = 2
                     FragmentMultiplicity = 2
-                    break  # Stop checking further lines in the current fragment
 
-        TotalCharge = FragmentCharge  # Assume ligand charge is 0 for now
-        TotalMultiplicity = FragmentMultiplicity
+            TotalCharge = FragmentCharge  # Assume ligand charge is 0 for now
+            TotalMultiplicity = FragmentMultiplicity
 
         OutputFile = f"{counter}-New.com"  
         with open(OutputFile, "w") as outputfile: 
