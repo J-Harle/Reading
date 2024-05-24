@@ -50,17 +50,22 @@ def generate_interactions(Fragments, N):
     PairwiseInteractions = set()
     
     for combo in combos:
-        four_body_combos = list(list(itertools.combinations(combo, 3)))
+        four_body_combos = list(itertools.combinations(combo, 3))
         FourBodyInteractions.update(four_body_combos)
         
         for four_body_combo in four_body_combos:
             # Generate all 3-body interactions for the current 4-body combination
-            three_body_combos = list(list(itertools.combinations(four_body_combo, 2)))
+            three_body_combos = list(itertools.combinations(four_body_combo, 2))
             ThreeBodyInteractions.update(three_body_combos)
             
             # Generate all 2-body interactions for the current 4-body combination
-            pairwise_combos = list(list(itertools.combinations(four_body_combo, 1)))
+            pairwise_combos = list(itertools.combinations(four_body_combo, 1))
             PairwiseInteractions.update(pairwise_combos)
+    
+    # Convert the sets to lists of strings
+    FourBodyInteractions = [str(interaction) for interaction in FourBodyInteractions]
+    ThreeBodyInteractions = [str(interaction) for interaction in ThreeBodyInteractions]
+    PairwiseInteractions = [str(interaction) for interaction in PairwiseInteractions]
     
     # Create copies of the interactions lists with fragment numbers replaced with '-Bq'
     FourBodyBq = [line.replace("(Fragment=" + str(i) + ")", "-Bq") for line in FourBodyInteractions]
