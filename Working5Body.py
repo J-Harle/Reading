@@ -113,7 +113,7 @@ def Headers(FragmentCombinations, ligand, user_inputs, bq_ligand, blank_ligand, 
             w(blank_ligand)
             w(blank_fragment_list[combo[0] - 1])
             w(blank_fragment_list[combo[1] - 1])
-            w(bq_fragment_lsit[combo[2] - 1])
+            w(bq_fragment_list[combo[2] - 1])
             w(blank_fragment_list[combo[3] - 1])
             w("\n--Link1--\n")   
 
@@ -257,7 +257,7 @@ def Headers(FragmentCombinations, ligand, user_inputs, bq_ligand, blank_ligand, 
             w(bq_ligand)
             w(blank_fragment_list[combo[0] - 1])
             w(blank_fragment_list[combo[1] - 1])
-            w(bq_fragment_lsit[combo[2] - 1])
+            w(bq_fragment_list[combo[2] - 1])
             w(blank_fragment_list[combo[3] - 1])
             w("\n--Link1--\n")   
 
