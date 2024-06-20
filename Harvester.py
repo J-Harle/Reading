@@ -1,6 +1,6 @@
 import os
 import re
-import pandas as pd
+import xlsxwriter
 
 def extract_scf_done_values(log_directory):
     scf_done_values = []
@@ -21,8 +21,17 @@ def extract_scf_done_values(log_directory):
     return scf_done_values
 
 def save_to_excel(data, output_file):
-    df = pd.DataFrame(data, columns=['SCF Done Values'])
-    df.to_excel(output_file, index=False)
+    workbook = xlsxwriter.Workbook(output_file)
+    worksheet = workbook.add_worksheet()
+
+    # Write header
+    worksheet.write(0, 0, 'SCF Done Values')
+
+    # Write data
+    for row_num, value in enumerate(data, 1):
+        worksheet.write(row_num, 0, value)
+    
+    workbook.close()
 
 if __name__ == "__main__":
     log_directory = "/path/to/your/log/files"  # Update this to your directory
