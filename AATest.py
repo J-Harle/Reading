@@ -16,24 +16,22 @@ coordinate_to_amino_acid = {
 }
 
 def search_coordinates_in_file(file_name):
-    found_amino_acids = []
+    found_amino_acids = set()  # Use a set to automatically handle uniqueness
     try:
         with open(file_name, 'r') as file:
             for line in file:
                 stripped_line = line.strip()
-                found = False
                 for key, amino_acid in coordinate_to_amino_acid.items():
                     if stripped_line.endswith(key):
-                        if amino_acid not in found_amino_acids:
-                            found_amino_acids.append(amino_acid)
-                            found = True
-                            break  # Break out of loop once a match is found
-                if found:
-                    break  # Exit the loop once the first unique amino acid is found
+                        found_amino_acids.add(amino_acid)
+                        break  # Break out of loop once a match is found
+    
     except FileNotFoundError:
         print(f"File '{file_name}' not found.")
     except Exception as e:
         print(f"Error processing file '{file_name}': {str(e)}")
+    
+    return list(found_amino_acids)
     
     return found_amino_acids
 if __name__ == "__main__":
