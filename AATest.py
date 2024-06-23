@@ -15,7 +15,7 @@ alpha_c_coord = {
     "C     0    9.96330700   -2.32906500    1.27171100 L": "Gly 3",
 }
 
-num_files = 3  # Number of files to process
+num_files = 364  # Number of files to process
 
 for counter in range(1, num_files + 1):
     filename = f"{counter}-New.com"
@@ -23,19 +23,15 @@ for counter in range(1, num_files + 1):
 
     try:
         with open(filename, 'r') as file:
-            for line in file:
-                for coord in alpha_c_coord:
-                    if coord in line:
-                        AA = alpha_c_coord[coord]
-                        if AA not in AA_in_file:
-                            AA_in_file.append(AA)
-                            if len(AA_in_file) == 3:
-                                break
-
-        if len(AA_in_file) == 3:
-            print(f"Amino acids in {filename}: {', '.join(AA_in_file)}")
-        else:
-            print(f"Error: Could not find exactly 3 amino acids in {filename}.")
-    
+            content = file.read()
+            for coord, AA in alpha_c_coord.items():
+                if coord in content:
+                    if AA not in AA_in_file:
+                        AA_in_file.append(AA)
+                    if len(AA_in_file) == 3:
+                        break
+        print(f"Amino acids in {filename}: {', '.join(AA_in_file)}")
     except FileNotFoundError:
         print(f"File {filename} not found.")
+    except Exception as e:
+        print(f"An error occurred while processing {filename}: {e}")
