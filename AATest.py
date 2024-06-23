@@ -21,14 +21,14 @@ def search_coordinates_in_file(file_name):
         with open(file_name, 'r') as file:
             for line in file:
                 stripped_line = line.strip()
-                # Extract the part of stripped_line before " L"
-                line_key = stripped_line.split(" L")[0]
-                for key, amino_acid in coordinate_to_amino_acid.items():
-                    # Extract the part of key before " L"
-                    key_part = key.split(" L")[0]
-                    if line_key == key_part:
-                        found_amino_acids.append(amino_acid)
-                        break  # Break out of loop once a match is found
+                # Split the line by spaces and extract the relevant part for comparison
+                line_parts = stripped_line.split()
+                if len(line_parts) >= 5:  # Ensure the line has at least 5 parts
+                    line_key = " ".join(line_parts[:5])  # Join the first 5 parts
+                    for key, amino_acid in coordinate_to_amino_acid.items():
+                        if key.startswith(line_key):
+                            found_amino_acids.append(amino_acid)
+                            break  # Break out of loop once a match is found
     except FileNotFoundError:
         print(f"File '{file_name}' not found.")
     except Exception as e:
