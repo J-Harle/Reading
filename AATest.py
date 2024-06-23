@@ -22,7 +22,6 @@ def search_coordinates_in_file(file_name):
             print(f"Searching coordinates in file: {file_name}")
             for line in file:
                 stripped_line = line.strip()
-                print(f"Checking line: '{stripped_line}'")  # Debugging output
                 found = False
                 for key in coordinate_to_amino_acid:
                     if stripped_line.startswith(key):
@@ -33,7 +32,7 @@ def search_coordinates_in_file(file_name):
                         found = True
                         break  # Break out of inner loop once a match is found
                 if found:
-                    # Remove break here to continue searching for other matches
+                    # If you want to find all occurrences, do not break here
                     pass
     except FileNotFoundError:
         print(f"File '{file_name}' not found.")
@@ -41,7 +40,7 @@ def search_coordinates_in_file(file_name):
         print(f"Error processing file '{file_name}': {str(e)}")
     
     return found_amino_acids
-    
+
 if __name__ == "__main__":
     file_name = "1-New.com"
     amino_acids = search_coordinates_in_file(file_name)
@@ -49,11 +48,3 @@ if __name__ == "__main__":
         print(f"Found amino acids corresponding to the coordinates: {amino_acids}")
     else:
         print("No matching amino acids found for the coordinates.")
-    
-if __name__ == "__main__":
-    file_name = "1-New.com"  # Specify the file to test with
-    amino_acid = search_first_coordinates_in_file(file_name)
-    if amino_acid:
-        print(f"First set of coordinates correspond to amino acid: {amino_acid}")
-    else:
-        print("No matching amino acid found for the first set of coordinates.")
