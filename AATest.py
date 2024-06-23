@@ -22,18 +22,19 @@ def search_first_coordinates_in_file(file_name):
             for line in file:
                 stripped_line = line.strip()
                 print(f"Checking line: '{stripped_line}'")  # Debugging output
-                if stripped_line in coordinate_to_amino_acid:
-                    found_amino_acid = coordinate_to_amino_acid[stripped_line]
-                    print(f"First set of coordinates found: {stripped_line}")
-                    print(f"Corresponding amino acid: {found_amino_acid}")
-                    return found_amino_acid
+                for key in coordinate_to_amino_acid:
+                    if stripped_line == key.strip():
+                        found_amino_acid = coordinate_to_amino_acid[key]
+                        print(f"First set of coordinates found: {stripped_line}")
+                        print(f"Corresponding amino acid: {found_amino_acid}")
+                        return found_amino_acid
     except FileNotFoundError:
         print(f"File '{file_name}' not found.")
     except Exception as e:
         print(f"Error processing file '{file_name}': {str(e)}")
     
     return None
-
+    
 if __name__ == "__main__":
     file_name = "1-New.com"  # Specify the file to test with
     amino_acid = search_first_coordinates_in_file(file_name)
