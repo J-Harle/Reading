@@ -19,21 +19,12 @@ def search_coordinates_in_file(file_name):
     found_amino_acids = []
     try:
         with open(file_name, 'r') as file:
-            print(f"Searching coordinates in file: {file_name}")
             for line in file:
                 stripped_line = line.strip()
-                found = False
-                for key in coordinate_to_amino_acid:
-                    if stripped_line.startswith(key):
-                        found_amino_acid = coordinate_to_amino_acid[key]
-                        print(f"Coordinates found: {stripped_line}")
-                        print(f"Corresponding amino acid: {found_amino_acid}")
-                        found_amino_acids.append(found_amino_acid)
-                        found = True
-                        break  # Break out of inner loop once a match is found
-                if found:
-                    # If you want to find all occurrences, do not break here
-                    pass
+                for key, amino_acid in coordinate_to_amino_acid.items():
+                    if stripped_line == key:
+                        found_amino_acids.append(amino_acid)
+                        break  # Break out of loop once a match is found
     except FileNotFoundError:
         print(f"File '{file_name}' not found.")
     except Exception as e:
