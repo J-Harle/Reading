@@ -18,17 +18,19 @@ alpha_c_coord = {
 # Number of files to process, change accordingly
 num_files = 364  
 
-for counter in range(1, num_files + 1):
-    filename = f"{counter}-New.com"
-    AA_in_file = []
+# Open a text file to write the results
+with open("amino_acids_in_files.txt", "w") as output_file:
+    for counter in range(1, num_files + 1):
+        filename = f"{counter}-New.com"
+        AA_in_file = []
 
-    with open(filename, 'r') as file:
-        content = file.read()
-        for coord, AA in alpha_c_coord.items():
-            if coord in content:
-                if AA not in AA_in_file:
-                    AA_in_file.append(AA)
-                if len(AA_in_file) == 3:
-                    break
-    print(f"Amino acids in {filename}: {'-'.join(AA_in_file)}")
-~                                                                  
+        with open(filename, 'r') as file:
+            content = file.read()
+            for coord, AA in alpha_c_coord.items():
+                if coord in content:
+                    if AA not in AA_in_file:
+                        AA_in_file.append(AA)
+                    if len(AA_in_file) == 3:
+                        break
+
+        output_file.write(f"Amino acids in {filename}: {'-'.join(AA_in_file)}\n")
