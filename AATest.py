@@ -21,21 +21,21 @@ def search_coordinates_in_file(file_name):
         with open(file_name, 'r') as file:
             for line in file:
                 stripped_line = line.strip()
-                # Split the line by spaces and extract the relevant part for comparison
-                line_parts = stripped_line.split()
-                if len(line_parts) >= 5:  # Ensure the line has at least 5 parts
-                    line_key = " ".join(line_parts[:5])  # Join the first 5 parts
-                    for key, amino_acid in coordinate_to_amino_acid.items():
-                        if key.startswith(line_key):
+                found = False
+                for key, amino_acid in coordinate_to_amino_acid.items():
+                    if stripped_line.endswith(key):
+                        if amino_acid not in found_amino_acids:
                             found_amino_acids.append(amino_acid)
+                            found = True
                             break  # Break out of loop once a match is found
+                if found:
+                    break  # Exit the loop once the first unique amino acid is found
     except FileNotFoundError:
         print(f"File '{file_name}' not found.")
     except Exception as e:
         print(f"Error processing file '{file_name}': {str(e)}")
     
     return found_amino_acids
-
 if __name__ == "__main__":
     file_name = "1-New.com"
     amino_acids = search_coordinates_in_file(file_name)
