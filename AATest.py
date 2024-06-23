@@ -18,14 +18,24 @@ alpha_c_coord = {
 num_files = 3  # Number of files to process
 
 for counter in range(1, num_files + 1):
-    AA_in_file = set()
     filename = f"{counter}-New.com"
+    AA_in_file = []
+
     try:
         with open(filename, 'r') as file:
             for line in file:
                 for coord in alpha_c_coord:
                     if coord in line:
-                        AA_in_file.add(alpha_c_coord[coord])
-        print(f"Amino acids in {filename}: {', '.join(AA_in_file)}")
+                        AA = alpha_c_coord[coord]
+                        if AA not in AA_in_file:
+                            AA_in_file.append(AA)
+                            if len(AA_in_file) == 3:
+                                break
+
+        if len(AA_in_file) == 3:
+            print(f"Amino acids in {filename}: {', '.join(AA_in_file)}")
+        else:
+            print(f"Error: Could not find exactly 3 amino acids in {filename}.")
+    
     except FileNotFoundError:
         print(f"File {filename} not found.")
