@@ -21,6 +21,7 @@ def search_first_coordinates_in_file(file_name):
             print(f"Searching first coordinates in file: {file_name}")
             for line in file:
                 stripped_line = line.strip()
+                print(f"Checking line: '{stripped_line}'")  # Debugging output
                 if stripped_line in coordinate_to_amino_acid:
                     found_amino_acid = coordinate_to_amino_acid[stripped_line]
                     print(f"First set of coordinates found: {stripped_line}")
