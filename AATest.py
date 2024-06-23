@@ -33,14 +33,15 @@ def search_coordinates_in_file(file_name):
                         found = True
                         break  # Break out of inner loop once a match is found
                 if found:
-                    break  # Break out of outer loop once a match is found
+                    # Remove break here to continue searching for other matches
+                    pass
     except FileNotFoundError:
         print(f"File '{file_name}' not found.")
     except Exception as e:
         print(f"Error processing file '{file_name}': {str(e)}")
     
     return found_amino_acids
-
+    
 if __name__ == "__main__":
     file_name = "1-New.com"
     amino_acids = search_coordinates_in_file(file_name)
