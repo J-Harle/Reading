@@ -16,18 +16,24 @@ coordinate_to_amino_acid = {
     "9.9633070 -2.3290650 1.2717110 L": "Gly 3",    
 }
 
-# Function to search for specific coordinates in a file
+# Search for specific coordinates in a file
 def search_coordinates_in_file(file_name):
     found_amino_acids = set()
+    count = 0  # Counter for found amino acids 
+    counter = 1
+    file_name = f"{counter}-New.com"
     try:
         with open(file_name, 'r') as file:
             for line in file:
                 stripped_line = line.strip()
                 if stripped_line in coordinate_to_amino_acid:
-                    found_amino_acids.add(coordinate_to_amino_acid[stripped_line])
-    except FileNotFoundError:
-        pass  # Skip the file if it doesn't exist
+                    found_amino_acid = coordinate_to_amino_acid[stripped_line]
+                    found_amino_acids.add(found_amino_acid)
+                    count += 1
+                    if count == 3: #Change if not doing 4 body interactions
+                        break  # Stop reading the file after finding 3 amino acids
     return found_amino_acids
+    counter += 1
 
 # Function to search for coordinates in multiple files
 def search_coordinates_in_files(max_file_number):
@@ -40,7 +46,7 @@ def search_coordinates_in_files(max_file_number):
 
 # Example usage
 if __name__ == "__main__":
-    max_file_number = 100  # Set the maximum number of files to check
+    max_file_number = 364  # Set the maximum number of files to check
     results = search_coordinates_in_files(max_file_number)
     
     for file_name, amino_acids in results.items():
