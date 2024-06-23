@@ -21,17 +21,12 @@ for counter in range(1, num_files + 1):
     filename = f"{counter}-New.com"
     AA_in_file = []
 
-    try:
-        with open(filename, 'r') as file:
-            content = file.read()
-            for coord, AA in alpha_c_coord.items():
-                if coord in content:
-                    if AA not in AA_in_file:
-                        AA_in_file.append(AA)
-                    if len(AA_in_file) == 3:
-                        break
-        print(f"Amino acids in {filename}: {', '.join(AA_in_file)}")
-    except FileNotFoundError:
-        print(f"File {filename} not found.")
-    except Exception as e:
-        print(f"An error occurred while processing {filename}: {e}")
+    with open(filename, 'r') as file:
+        content = file.read()
+        for coord, AA in alpha_c_coord.items():
+            if coord in content:
+                if AA not in AA_in_file:
+                    AA_in_file.append(AA)
+                if len(AA_in_file) == 3:
+                    break
+    print(f"Amino acids in {filename}: {', '.join(AA_in_file)}")
