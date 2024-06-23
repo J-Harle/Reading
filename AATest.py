@@ -15,25 +15,39 @@ coordinate_to_amino_acid = {
     "C     0   9.96330700   -2.32906500    1.27171100 L": "Gly 3",    
 }
 
-def search_first_coordinates_in_file(file_name):
+def search_coordinates_in_file(file_name):
+    found_amino_acids = []
     try:
         with open(file_name, 'r') as file:
-            print(f"Searching first coordinates in file: {file_name}")
+            print(f"Searching coordinates in file: {file_name}")
             for line in file:
                 stripped_line = line.strip()
                 print(f"Checking line: '{stripped_line}'")  # Debugging output
+                found = False
                 for key in coordinate_to_amino_acid:
                     if stripped_line.startswith(key):
                         found_amino_acid = coordinate_to_amino_acid[key]
-                        print(f"First set of coordinates found: {stripped_line}")
+                        print(f"Coordinates found: {stripped_line}")
                         print(f"Corresponding amino acid: {found_amino_acid}")
-                        return found_amino_acid
+                        found_amino_acids.append(found_amino_acid)
+                        found = True
+                        break  # Break out of inner loop once a match is found
+                if found:
+                    break  # Break out of outer loop once a match is found
     except FileNotFoundError:
         print(f"File '{file_name}' not found.")
     except Exception as e:
         print(f"Error processing file '{file_name}': {str(e)}")
     
-    return None
+    return found_amino_acids
+
+if __name__ == "__main__":
+    file_name = "1-New.com"
+    amino_acids = search_coordinates_in_file(file_name)
+    if amino_acids:
+        print(f"Found amino acids corresponding to the coordinates: {amino_acids}")
+    else:
+        print("No matching amino acids found for the coordinates.")
     
 if __name__ == "__main__":
     file_name = "1-New.com"  # Specify the file to test with
