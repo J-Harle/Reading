@@ -1,4 +1,4 @@
-coordinate_to_amino_acid = {
+alpha_c_coord = {
     "C     0   -6.16731500   -1.00122300   -5.55078900 L": "Gly",
     "C     0   -10.72451300   -2.37171300   -1.74666900 L": "Thr",
     "C     0   -8.57988800   -5.52315400    0.73636700 L": "Ala",
@@ -12,32 +12,20 @@ coordinate_to_amino_acid = {
     "C     0   8.47649100    2.28203500   -2.41588500 L": "Tyr",
     "C     0   4.90693600    4.74026800    3.18086700 L": "Cys",
     "C     0   11.16489700   -2.34085000   -2.33665000 L": "His",
-    "C     0   9.96330700   -2.32906500    1.27171100 L": "Gly 3",    
+    "C     0   9.96330700   -2.32906500    1.27171100 L": "Gly 3",
 }
 
-def search_coordinates_in_file(file_name):
-    found_amino_acids = set()  # Use a set to automatically handle uniqueness
+num_files = 3  # Number of files to process
+
+for counter in range(1, num_files + 1):
+    AA_in_file = set()
+    filename = f"{counter}-New.com"
     try:
-        with open(file_name, 'r') as file:
+        with open(filename, 'r') as file:
             for line in file:
-                stripped_line = line.strip()
-                for key, amino_acid in coordinate_to_amino_acid.items():
-                    if stripped_line.endswith(key):
-                        found_amino_acids.add(amino_acid)
-                        break  # Break out of loop once a match is found
-    
+                for coord in alpha_c_coord:
+                    if coord in line:
+                        AA_in_file.add(alpha_c_coord[coord])
+        print(f"Amino acids in {filename}: {', '.join(AA_in_file)}")
     except FileNotFoundError:
-        print(f"File '{file_name}' not found.")
-    except Exception as e:
-        print(f"Error processing file '{file_name}': {str(e)}")
-    
-    return list(found_amino_acids)
-    
-    return found_amino_acids
-if __name__ == "__main__":
-    file_name = "1-New.com"
-    amino_acids = search_coordinates_in_file(file_name)
-    if amino_acids:
-        print(f"Found amino acids corresponding to the coordinates: {amino_acids}")
-    else:
-        print("No matching amino acids found for the coordinates.")
+        print(f"File {filename} not found.")
