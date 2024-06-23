@@ -23,7 +23,7 @@ def search_first_coordinates_in_file(file_name):
                 stripped_line = line.strip()
                 print(f"Checking line: '{stripped_line}'")  # Debugging output
                 for key in coordinate_to_amino_acid:
-                    if stripped_line == key.strip():
+                    if stripped_line.startswith(key):
                         found_amino_acid = coordinate_to_amino_acid[key]
                         print(f"First set of coordinates found: {stripped_line}")
                         print(f"Corresponding amino acid: {found_amino_acid}")
