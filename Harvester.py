@@ -1,4 +1,3 @@
-import re
 import os
 
 # Number of files to process, change accordingly
@@ -16,17 +15,12 @@ with open("SCF_values_in_files.txt", "w") as output_file:
 
         try:
             with open(filename, 'r') as file:
-                content = file.read()
-
-                # Debugging: Print a part of the content around "SCF Done" to ensure correct capture
-                scf_done_context = re.findall(r"(.{0,50}SCF Done:.{0,50})", content)
-                print(f"Context around 'SCF Done' in {filename}:\n{scf_done_context}\n")
-
-                # Find all occurrences of SCF Done followed by a value with either a.u. or A.U.
-                matches = re.findall(r"SCF Done:\s*([\d\.\-E+]+)\s*[aA]\.\s*[uU]", content)
-
-                if matches:
-                    SCF_values.extend(matches)
+                for line in file:
+                    # Look for lines containing "SCF Done" followed by a value with "a.u." or "A.U."
+                    if "SCF Done" in line:
+                        match = re.search(r"SCF Done:\s*([\d\.\-E+]+)\s*[aA]\.[uU]", line)
+                        if match:
+                            SCF_values.append(match.group(1))
 
             if SCF_values:
                 output_file.write(f"SCF values in {filename}:\n")
@@ -37,5 +31,3 @@ with open("SCF_values_in_files.txt", "w") as output_file:
         
         except Exception as e:
             output_file.write(f"An error occurred while processing {filename}: {e}\n")
-            # Debugging: Print the error message
-            print(f"An error occurred while processing {filename}: {e}\n")
