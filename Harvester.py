@@ -17,6 +17,9 @@ with open("SCF_values_in_files.txt", "w") as output_file:
         try:
             with open(filename, 'r') as file:
                 content = file.read()
+                # Debugging: Print a small part of the content to check if it's being read correctly
+                print(f"Reading {filename}, content preview: {content[:100]}...")
+
                 # Find all occurrences of SCF Done followed by a value with A.U
                 matches = re.findall(r"SCF Done:\s*([\d\.\-E+]+)\s*A\.U", content)
                 if matches:
@@ -31,3 +34,5 @@ with open("SCF_values_in_files.txt", "w") as output_file:
         
         except Exception as e:
             output_file.write(f"An error occurred while processing {filename}: {e}\n")
+            # Debugging: Print the error message
+            print(f"An error occurred while processing {filename}: {e}\n")
