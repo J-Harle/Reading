@@ -1,4 +1,5 @@
 import re
+import os
 
 # Number of files to process, change accordingly
 num_files = 364  
@@ -8,6 +9,10 @@ with open("SCF_values_in_files.txt", "w") as output_file:
     for counter in range(1, num_files + 1):
         filename = f"{counter}-New.log"
         SCF_values = []
+
+        if not os.path.isfile(filename):
+            output_file.write(f"{filename} does not exist.\n")
+            continue
 
         with open(filename, 'r') as file:
             content = file.read()
