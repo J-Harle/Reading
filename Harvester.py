@@ -1,33 +1,24 @@
-import os
 import re
-import pandas as pd
 
-def extract_scf_done_values(log_directory):
-    scf_done_values = []
-    scf_done_pattern = re.compile(r'SCF Done:\s+E\(\w+\)\s+=\s+(-?\d+\.\d+)')
-    
-    # Traverse the log directory
-    for root, _, files in os.walk(log_directory):
-        for file in files:
-            if file.endswith('.log'):
-                file_path = os.path.join(root, file)
-                with open(file_path, 'r') as f:
-                    for line in f:
-                        match = scf_done_pattern.search(line)
-                        if match:
-                            scf_done_values.append(float(match.group(1)))
-                            break  # Only take the first match in each file
+# Number of files to process, change accordingly
+num_files = 364  
 
-    return scf_done_values
+# Open a text file to write the results
+with open("SCF_values_in_files.txt", "w") as output_file:
+    for counter in range(1, num_files + 1):
+        filename = f"{counter}-New.log"
+        SCF_values = []
 
-def save_to_excel(data, output_file):
-    df = pd.DataFrame(data, columns=['SCF Done Values'])
-    df.to_excel(output_file, index=False)
+        with open(filename, 'r') as file:
+            content = file.read()
+            # Find all occurrences of SCF Done followed by a value with A.U
+            matches = re.findall(r"SCF Done:\s*([\d\.\-E+]+)\s*A\.U", content)
+            if matches:
+                SCF_values.extend(matches)
 
-if __name__ == "__main__":
-    log_directory = "/path/to/your/log/files"  # Update this to your directory
-    output_file = "scf_done_values.xlsx"
-    
-    scf_done_values = extract_scf_done_values(log_directory)
-    save_to_excel(scf_done_values, output_file)
-    print(f"Extracted {len(scf_done_values)} values and saved to {output_file}.")
+        if SCF_values:
+            output_file.write(f"SCF values in {filename}:\n")
+            for value in SCF_values:
+                output_file.write(f"{value}\n")
+        else:
+            output_file.write(f"No SCF values with A.U found in {filename}\n")
