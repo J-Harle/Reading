@@ -1,4 +1,6 @@
-#Coordinates of the alpha carbons of each amino acid (Change according to active site)
+import itertools
+
+# Coordinates of the alpha carbons of each amino acid (Change according to active site)
 alpha_c_coord = {
     "C     0   -6.16731500   -1.00122300   -5.55078900 L": "Gly",
     "C     0  -10.72451300   -2.37171300   -1.74666900 L": "Thr",
@@ -14,20 +16,29 @@ alpha_c_coord = {
     "C    0    4.90693600    4.74026800    3.18086700 L": "Cys",
     "C     0   11.16489700   -2.34085000   -2.33665000 L": "His",
     "C     0    9.96330700   -2.32906500    1.27171100 L": "Gly3",
+    "C                 -8.57988800   -5.52315400    0.73636700": "Ala",
 }
+
+n = int(input("How many amino acids are there in each file?: "))
+k = int(input("How many amino acids are there in the active site? (ALDH=14): "))
+num_combinations = len(list(itertools.combinations(range(n), k)))
+
 # Open a text file to write the results
 with open("amino_acids_in_files.txt", "w") as output_file:
-    for counter in range(1, num_files + 1):
+    for counter in range(1, num_combinations + 1):
         filename = f"{counter}-New.com"
         AA_in_file = []
 
-        with open(filename, 'r') as file:
-            content = file.read()
-            for coord, AA in alpha_c_coord.items():
-                if coord in content:
-                    if AA not in AA_in_file:
-                        AA_in_file.append(AA)
-                    if len(AA_in_file) == 3:
-                        break
+        try:
+            with open(filename, 'r') as file:
+                content = file.read()
+                for coord, AA in alpha_c_coord.items():
+                    if coord in content:
+                        if AA not in AA_in_file:
+                            AA_in_file.append(AA)
+                        if len(AA_in_file) == n:
+                            break
 
-        output_file.write(f"Amino acids in {filename}: {'-'.join(AA_in_file)}\n")
+            output_file.write(f"Amino acids in {filename}: {'-'.join(AA_in_file)}\n")
+        except FileNotFoundError:
+            output_file.write(f"File {filename} not found.\n")
