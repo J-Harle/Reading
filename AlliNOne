@@ -40,8 +40,13 @@ def reading_file(FileName, k):
     return ligand, bq_ligand, blank_ligand, fragment_list, bq_fragment_list, blank_fragment_list
 
 def generate_combinations(fragments, K):
-    FragmentCombinations = itertools.combinations(fragments, K)
-    return FragmentCombinations
+    return itertools.combinations(fragments, K)
+
+def write_header(outputfile, header_type, ligands, fragments):
+    outputfile.writelines(header_type)
+    outputfile.writelines(ligands)
+    outputfile.writelines(fragments)
+    outputfile.write("\n--Link1--\n")
 
 def headers(FragmentCombinations, ligand, user_inputs, bq_ligand, blank_ligand, bq_fragment_list, blank_fragment_list):
     N, FileName, Mem, Cores, Functional, BasisSet, CorrSolvent, OtherInput = user_inputs
@@ -51,18 +56,18 @@ def headers(FragmentCombinations, ligand, user_inputs, bq_ligand, blank_ligand, 
     coords_to_remove = {
         "ala_ser": [
             "H    0   -6.55416120   -6.05342200    0.67196340 L",  # Ala coordinates
-            "O    0   -7.54013160   -5.79834050    0.49075190 L",    # Ser coordinates:
+            "O    0   -7.54013160   -5.79834050    0.49075190 L",  # Ser coordinates
             "H    0   -8.14204880   -5.89238440    1.23267610 L" 
         ],
         "ser_val": [
             "H    0   -3.02666380   -6.78932410    0.80612210 L",  # Ser coordinates
-            "H    0   -4.03060530   -7.09699790    0.36810310 L",   # Val coordinates
+            "H    0   -4.03060530   -7.09699790    0.36810310 L",  # Val coordinates
             "O    0   -3.99861870   -6.18252120    0.65846340 L"
         ],
         "his_gly3": [
-            "O     0   10.29649250   -2.41901770   -0.2378918 L",  # His coordinates:
+            "O     0   10.29649250   -2.41901770   -0.2378918 L",  # His coordinates
             "H     0   10.36614620   -1.71366010   0.88536300 L",  
-            "H     0    9.84058420   -2.7485774    -0.7157113 L"   # Gly3 coordinate
+            "H     0    9.84058420   -2.7485774    -0.7157113 L"   # Gly3 coordinates
         ],
     }
 
@@ -86,27 +91,28 @@ def headers(FragmentCombinations, ligand, user_inputs, bq_ligand, blank_ligand, 
                 "\n"
             ]
 
-            w=outputfile.writelines
             TotalHeader = BaseHeader + [str(TotalCharge) + " " + str(TotalMultiplicity) + "\n"]
             LigandHeader = BaseHeader + [str(LigandCharge) + " " + str(LigandMultiplicity) + "\n"]
             FragmentHeader = BaseHeader + [str(FragmentCharge) + " " + str(FragmentMultiplicity) + "\n"]
 
-            # Write headers and data
-            w(TotalHeader)
-            w(blank_ligand)
-            for fragment in combo:
-                w(blank_fragment_list[fragment - 1])
-            outputfile.write("\n--Link1--\n")
-            w(FragmentHeader)
-            w(bq_ligand)
-            for fragment in combo:
-                w(blank_fragment_list[fragment - 1])
-            outputfile.write("\n--Link1--\n")
-            w(LigandHeader)
-            w(blank_ligand)
-            for fragment in combo:
-                w(bq_fragment_list[fragment - 1])
-            outputfile.write("\n")
+            if N >= 1:
+                write_header(outputfile, TotalHeader, blank_ligand, [blank_fragment_list[i-1] for i in combo])
+                write_header(outputfile, FragmentHeader, bq_ligand, [blank_fragment_list[i-1] for i in combo])
+                write_header(outputfile, LigandHeader, blank_ligand, [bq_fragment_list[i-1] for i in combo])
+
+            if N >= 2:
+                write_header(outputfile, LigandHeader, blank_ligand, [bq_fragment_list[combo[0]-1], blank_fragment_list[combo[1]-1]])
+                write_header(outputfile, LigandHeader, blank_ligand, [blank_fragment_list[combo[0]-1], bq_fragment_list[combo[1]-1]])
+
+            if N >= 3:
+                write_header(outputfile, LigandHeader, blank_ligand, [bq_fragment_list[combo[0]-1], blank_fragment_list[combo[1]-1], blank_fragment_list[combo[2]-1]])
+                write_header(outputfile, LigandHeader, blank_ligand, [blank_fragment_list[combo[0]-1], bq_fragment_list[combo[1]-1], blank_fragment_list[combo[2]-1]])
+                write_header(outputfile, LigandHeader, blank_ligand, [blank_fragment_list[combo[0]-1], blank_fragment_list[combo[1]-1], bq_fragment_list[combo[2]-1]])
+
+            if N == 4:
+                write_header(outputfile, LigandHeader, blank_ligand, [bq_fragment_list[combo[0]-1], bq_fragment_list[combo[1]-1], blank_fragment_list[combo[2]-1]])
+                write_header(outputfile, LigandHeader, blank_ligand, [bq_fragment_list[combo[0]-1], blank_fragment_list[combo[1]-1], bq_fragment_list[combo[2]-1]])
+                write_header(outputfile, LigandHeader, blank_ligand, [blank_fragment_list[combo[0]-1], bq_fragment_list[combo[1]-1], bq_fragment_list[combo[2]-1]])
 
         # Now, check the generated file for specific amino acid pairs
         with open(OutputFile, "r") as infile:
@@ -119,25 +125,27 @@ def headers(FragmentCombinations, ligand, user_inputs, bq_ligand, blank_ligand, 
         has_his = any(coords_to_remove["his_gly3"][0] in line for line in lines)
         has_gly3 = any(coords_to_remove["his_gly3"][1] in line for line in lines)
 
-        # Determine which pair is present and remove corresponding coordinates
-        modified_lines = lines.copy()
+        # If the pairs exist, remove only the specific coordinates
         if has_ala and has_ser:
-            modified_lines = [line for line in modified_lines if coords_to_remove["ala_ser"][0] not in line and coords_to_remove["ala_ser"][1] not in line]
+            for coord in coords_to_remove["ala_ser"]:
+                lines = [line for line in lines if coord not in line]
         if has_ser and has_val:
-            modified_lines = [line for line in modified_lines if coords_to_remove["ser_val"][0] not in line and coords_to_remove["ser_val"][1] not in line]
+            for coord in coords_to_remove["ser_val"]:
+                lines = [line for line in lines if coord not in line]
         if has_his and has_gly3:
-            modified_lines = [line for line in modified_lines if coords_to_remove["his_gly3"][0] not in line and coords_to_remove["his_gly3"][1] not in line]
+            for coord in coords_to_remove["his_gly3"]:
+                lines = [line for line in lines if coord not in line]
 
-        # Write the modified content back to the file
+        # Write back the modified lines to the output file
         with open(OutputFile, "w") as outfile:
-            outfile.writelines(modified_lines)
+            outfile.writelines(lines)
 
         counter += 1
 
 
-# Execution starts here
-user_inputs = user_inputs()
-N, FileName, Mem, Cores, Functional, BasisSet, CorrSolvent, OtherInput = user_inputs
-ligand, bq_ligand, blank_ligand, fragment_list, bq_fragment_list, blank_fragment_list = reading_file(FileName, N)
-FragmentCombinations = generate_combinations(fragment_list.keys(), N)
-headers(FragmentCombinations, ligand, user_inputs, bq_ligand, blank_ligand, bq_fragment_list, blank_fragment_list)
+if __name__ == "__main__":
+    user_inp = user_inputs()
+    N, FileName, Mem, Cores, Functional, BasisSet, CorrSolvent, OtherInput = user_inp
+    ligand, bq_ligand, blank_ligand, fragment_list, bq_fragment_list, blank_fragment_list = reading_file(FileName, 14)
+    FragmentCombinations = generate_combinations(range(2, N+2), N)
+    headers(FragmentCombinations, ligand, user_inp, bq_ligand, blank_ligand, bq_fragment_list, blank_fragment_list)
