@@ -51,7 +51,6 @@ def write_header(outputfile, header, ligand, fragments):
     for fragment in fragments:
         outputfile.write(fragment + "\n")  # Write each fragment with newline
 
-
 def headers(FragmentCombinations, ligand, user_inputs, bq_ligand, blank_ligand, bq_fragment_list, blank_fragment_list):
     N, FileName, Mem, Cores, Functional, BasisSet, CorrSolvent, OtherInput = user_inputs
     counter = 1  
@@ -114,6 +113,13 @@ def headers(FragmentCombinations, ligand, user_inputs, bq_ligand, blank_ligand, 
         # Now, check the generated file for specific amino acid pairs
         with open(OutputFile, "r") as infile:
             lines = infile.readlines()
+
+        # Assuming coords_to_remove is defined elsewhere
+        coords_to_remove = {
+            "ala_ser": ["ALA_SER_COORD1", "ALA_SER_COORD2"],
+            "ser_val": ["SER_VAL_COORD1", "SER_VAL_COORD2"],
+            "his_gly3": ["HIS_GLY3_COORD1", "HIS_GLY3_COORD2"]
+        }
 
         # Flags to check presence of pairs
         has_ala = any(coords_to_remove["ala_ser"][0] in line for line in lines)
