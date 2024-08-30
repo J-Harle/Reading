@@ -39,19 +39,6 @@ def reading_file(FileName, k):
 def generate_combinations(fragments, K):
     return itertools.combinations(fragments, K)
 
-def write_header(outputfile, header, ligand, fragments):
-    # Write header lines
-    outputfile.writelines(header)
-    
-    # Ensure ligand is a string
-    if isinstance(ligand, list):
-        ligand = ''.join(ligand)
-    
-    outputfile.write(ligand)  # Add newline after ligand
-    for fragment in fragments:
-        outputfile.write(fragment)  # Write each fragment with newline
-
-
 def headers(FragmentCombinations, ligand, user_inputs, bq_ligand, blank_ligand, bq_fragment_list, blank_fragment_list):
     N, FileName, Mem, Cores, Functional, BasisSet, CorrSolvent, OtherInput = user_inputs
     counter = 1  
