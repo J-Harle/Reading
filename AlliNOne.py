@@ -39,7 +39,7 @@ def reading_file(FileName, k):
 def generate_combinations(fragments, K):
     return itertools.combinations(fragments, K)
 
-def w(outputfile, header_type, ligands, fragments):
+def write_header(outputfile, header_type, ligands, fragments):
     outputfile.writelines(header_type)
     outputfile.writelines(ligands)
     outputfile.writelines(fragments)
@@ -91,62 +91,61 @@ def headers(FragmentCombinations, ligand, user_inputs, bq_ligand, blank_ligand, 
             LigandHeader = BaseHeader + [str(LigandCharge) + " " + str(LigandMultiplicity) + "\n"]
             FragmentHeader = BaseHeader + [str(FragmentCharge) + " " + str(FragmentMultiplicity) + "\n"]
 
-            w = write_header
             if N == 3:
                 # Ligand + Frag1 + Frag2 + Frag3
-                w(outputfile, TotalHeader, blank_ligand, [blank_fragment_list[i-1] for i in combo])
+                write_header(outputfile, TotalHeader, blank_ligand, [blank_fragment_list[i-1] for i in combo])
                 # Ligand + Frag1(Bq) + Frag2 + Frag3
-                w(outputfile, LigandHeader, blank_ligand, [bq_fragment_list[combo[0] - 1]] + [blank_fragment_list[i-1] for i in combo[1:]])
+                write_header(outputfile, LigandHeader, blank_ligand, [bq_fragment_list[combo[0] - 1]] + [blank_fragment_list[i-1] for i in combo[1:]])
                 # Ligand + Frag1 + Frag2(Bq) + Frag3
-                w(outputfile, LigandHeader, blank_ligand, [blank_fragment_list[combo[0] - 1], bq_fragment_list[combo[1] - 1]] + [blank_fragment_list[i-1] for i in combo[2:]])
+                write_header(outputfile, LigandHeader, blank_ligand, [blank_fragment_list[combo[0] - 1], bq_fragment_list[combo[1] - 1]] + [blank_fragment_list[i-1] for i in combo[2:]])
                 # Ligand + Frag1 + Frag2 + Frag3(Bq)
-                w(outputfile, LigandHeader, blank_ligand, [blank_fragment_list[i-1] for i in combo[:2]] + [bq_fragment_list[combo[2] - 1]])
+                write_header(outputfile, LigandHeader, blank_ligand, [blank_fragment_list[i-1] for i in combo[:2]] + [bq_fragment_list[combo[2] - 1]])
                 # Ligand + Frag1(Bq) + Frag2(Bq) + Frag3
-                w(outputfile, LigandHeader, blank_ligand, [bq_fragment_list[combo[0] - 1], bq_fragment_list[combo[1] - 1]] + [blank_fragment_list[combo[2] - 1]])
+                write_header(outputfile, LigandHeader, blank_ligand, [bq_fragment_list[combo[0] - 1], bq_fragment_list[combo[1] - 1]] + [blank_fragment_list[combo[2] - 1]])
                 # Ligand + Frag1(Bq) + Frag2 + Frag3(Bq)
-                w(outputfile, LigandHeader, blank_ligand, [bq_fragment_list[combo[0] - 1]] + [blank_fragment_list[combo[1] - 1], bq_fragment_list[combo[2] - 1]])
+                write_header(outputfile, LigandHeader, blank_ligand, [bq_fragment_list[combo[0] - 1]] + [blank_fragment_list[combo[1] - 1], bq_fragment_list[combo[2] - 1]])
                 # Ligand + Frag1 + Frag2(Bq) + Frag3(Bq)
-                w(outputfile, LigandHeader, blank_ligand, [blank_fragment_list[combo[0] - 1]] + [bq_fragment_list[combo[1] - 1], bq_fragment_list[combo[2] - 1]])
+                write_header(outputfile, LigandHeader, blank_ligand, [blank_fragment_list[combo[0] - 1]] + [bq_fragment_list[combo[1] - 1], bq_fragment_list[combo[2] - 1]])
                 # Ligand + Frag1(Bq) + Frag2(Bq) + Frag3(Bq)
-                w(outputfile, LigandHeader, blank_ligand, [bq_fragment_list[combo[0] - 1], bq_fragment_list[combo[1] - 1], bq_fragment_list[combo[2] - 1]])
+                write_header(outputfile, LigandHeader, blank_ligand, [bq_fragment_list[combo[0] - 1], bq_fragment_list[combo[1] - 1], bq_fragment_list[combo[2] - 1]])
                 # Ligand(Bq) + Frag1 + Frag2 + Frag3
-                w(outputfile, FragmentHeader, bq_ligand, [blank_fragment_list[i-1] for i in combo])
+                write_header(outputfile, FragmentHeader, bq_ligand, [blank_fragment_list[i-1] for i in combo])
                 # Ligand(Bq) + Frag1(Bq) + Frag2 + Frag3
-                w(outputfile, FragmentHeader, bq_ligand, [bq_fragment_list[combo[0] - 1]] + [blank_fragment_list[i-1] for i in combo[1:]])
+                write_header(outputfile, FragmentHeader, bq_ligand, [bq_fragment_list[combo[0] - 1]] + [blank_fragment_list[i-1] for i in combo[1:]])
                 # Ligand(Bq) + Frag1 + Frag2(Bq) + Frag3
-                w(outputfile, FragmentHeader, bq_ligand, [blank_fragment_list[combo[0] - 1], bq_fragment_list[combo[1] - 1]] + [blank_fragment_list[combo[2] - 1]])
+                write_header(outputfile, FragmentHeader, bq_ligand, [blank_fragment_list[combo[0] - 1], bq_fragment_list[combo[1] - 1]] + [blank_fragment_list[combo[2] - 1]])
                 # Ligand(Bq) + Frag1 + Frag2 + Frag3(Bq)
-                w(outputfile, FragmentHeader, bq_ligand, [blank_fragment_list[i-1] for i in combo[:2]] + [bq_fragment_list[combo[2] - 1]])
+                write_header(outputfile, FragmentHeader, bq_ligand, [blank_fragment_list[i-1] for i in combo[:2]] + [bq_fragment_list[combo[2] - 1]])
                 # Ligand(Bq) + Frag1(Bq) + Frag2(Bq) + Frag3
-                w(outputfile, FragmentHeader, bq_ligand, [bq_fragment_list[combo[0] - 1], bq_fragment_list[combo[1] - 1]] + [blank_fragment_list[combo[2] - 1]])
+                write_header(outputfile, FragmentHeader, bq_ligand, [bq_fragment_list[combo[0] - 1], bq_fragment_list[combo[1] - 1]] + [blank_fragment_list[combo[2] - 1]])
                 # Ligand(Bq) + Frag1(Bq) + Frag2 + Frag3(Bq)
-                w(outputfile, FragmentHeader, bq_ligand, [bq_fragment_list[combo[0] - 1]] + [blank_fragment_list[combo[1] - 1], bq_fragment_list[combo[2] - 1]])
+                write_header(outputfile, FragmentHeader, bq_ligand, [bq_fragment_list[combo[0] - 1]] + [blank_fragment_list[combo[1] - 1], bq_fragment_list[combo[2] - 1]])
                 # Ligand(Bq) + Frag1 + Frag2(Bq) + Frag3(Bq)
-                w(outputfile, FragmentHeader, bq_ligand, [blank_fragment_list[combo[0] - 1]] + [bq_fragment_list[combo[1] - 1], bq_fragment_list[combo[2] - 1]])
+                write_header(outputfile, FragmentHeader, bq_ligand, [blank_fragment_list[combo[0] - 1]] + [bq_fragment_list[combo[1] - 1], bq_fragment_list[combo[2] - 1]])
             
             elif N == 2:
                 # Ligand + Frag1 + Frag2
-                w(outputfile, TotalHeader, blank_ligand, [blank_fragment_list[i-1] for i in combo])
+                write_header(outputfile, TotalHeader, blank_ligand, [blank_fragment_list[i-1] for i in combo])
                 # Ligand + Frag1(Bq) + Frag2
-                w(outputfile, LigandHeader, blank_ligand, [bq_fragment_list[combo[0] - 1]] + [blank_fragment_list[combo[1] - 1]])
+                write_header(outputfile, LigandHeader, blank_ligand, [bq_fragment_list[combo[0] - 1]] + [blank_fragment_list[combo[1] - 1]])
                 # Ligand + Frag1 + Frag2(Bq)
-                w(outputfile, LigandHeader, blank_ligand, [blank_fragment_list[combo[0] - 1], bq_fragment_list[combo[1] - 1]])
+                write_header(outputfile, LigandHeader, blank_ligand, [blank_fragment_list[combo[0] - 1], bq_fragment_list[combo[1] - 1]])
                 # Ligand + Frag1(Bq) + Frag2(Bq)
-                w(outputfile, LigandHeader, blank_ligand, [bq_fragment_list[combo[0] - 1], bq_fragment_list[combo[1] - 1]])
+                write_header(outputfile, LigandHeader, blank_ligand, [bq_fragment_list[combo[0] - 1], bq_fragment_list[combo[1] - 1]])
                 # Ligand(Bq) + Frag1 + Frag2
-                w(outputfile, FragmentHeader, bq_ligand, [blank_fragment_list[i-1] for i in combo])
+                write_header(outputfile, FragmentHeader, bq_ligand, [blank_fragment_list[i-1] for i in combo])
                 # Ligand(Bq) + Frag1(Bq) + Frag2
-                w(outputfile, FragmentHeader, bq_ligand, [bq_fragment_list[combo[0] - 1]] + [blank_fragment_list[combo[1] - 1]])
+                write_header(outputfile, FragmentHeader, bq_ligand, [bq_fragment_list[combo[0] - 1]] + [blank_fragment_list[combo[1] - 1]])
                 # Ligand(Bq) + Frag1 + Frag2(Bq)
-                w(outputfile, FragmentHeader, bq_ligand, [blank_fragment_list[combo[0] - 1], bq_fragment_list[combo[1] - 1]])
+                write_header(outputfile, FragmentHeader, bq_ligand, [blank_fragment_list[combo[0] - 1], bq_fragment_list[combo[1] - 1]])
             
             elif N == 1:
                 # Ligand + Frag1
-                w(outputfile, TotalHeader, blank_ligand, [blank_fragment_list[i-1] for i in combo])
+                write_header(outputfile, TotalHeader, blank_ligand, [blank_fragment_list[i-1] for i in combo])
                 # Ligand(Bq) + Frag1
-                w(outputfile, FragmentHeader, bq_ligand, [blank_fragment_list[i-1] for i in combo])
+                write_header(outputfile, FragmentHeader, bq_ligand, [blank_fragment_list[i-1] for i in combo])
                 # Ligand + Frag1(Bq)
-                w(outputfile, LigandHeader, blank_ligand, [bq_fragment_list[i-1] for i in combo])
+                write_header(outputfile, LigandHeader, blank_ligand, [bq_fragment_list[i-1] for i in combo])
 
         # Now, check the generated file for specific amino acid pairs
         with open(OutputFile, "r") as infile:
