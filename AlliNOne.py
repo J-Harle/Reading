@@ -116,10 +116,8 @@ def headers(FragmentCombinations, ligand, user_inputs, bq_ligand, blank_ligand, 
                 write_header(outputfile, FragmentHeader, bq_ligand, [blank_fragment_list[combo[0] - 1], bq_fragment_list[combo[1] - 1]] + [blank_fragment_list[combo[2] - 1]])
                 # Ligand(Bq) + Frag1 + Frag2 + Frag3(Bq)
                 write_header(outputfile, FragmentHeader, bq_ligand, [blank_fragment_list[i-1] for i in combo[:2]] + [bq_fragment_list[combo[2] - 1]])
-                # Ligand(Bq) + Frag1(Bq) + Frag2(Bq) + Frag3
-                write_header(outputfile, FragmentHeader, bq_ligand, [bq_fragment_list[combo[0] - 1], bq_fragment_list[combo[1] - 1]] + [blank_fragment_list[combo[2] - 1]])
                 # Ligand(Bq) + Frag1(Bq) + Frag2 + Frag3(Bq)
-                write_header(outputfile, FragmentHeader, bq_ligand, [bq_fragment_list[combo[0] - 1]] + [blank_fragment_list[combo[1] - 1], bq_fragment_list[combo[2] - 1]])
+                write_header(outputfile, FragmentHeader, bq_ligand, [bq_fragment_list[combo[0] - 1], bq_fragment_list[combo[1] - 1]] + [blank_fragment_list[combo[2] - 1]])
                 # Ligand(Bq) + Frag1 + Frag2(Bq) + Frag3(Bq)
                 write_header(outputfile, FragmentHeader, bq_ligand, [blank_fragment_list[combo[0] - 1]] + [bq_fragment_list[combo[1] - 1], bq_fragment_list[combo[2] - 1]])
             
