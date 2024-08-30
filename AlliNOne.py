@@ -44,44 +44,47 @@ def ReadingFile(FileName, k):
 def GenerateCombinations(Fragments, K):
     return itertools.combinations(Fragments, K)
 
+def RemoveCoordinates(lines, coords_to_remove):
+    return [line for line in lines if not any(coord in line for coord in coords_to_remove)]
+
 def Headers(FragmentCombinations, ligand, user_inputs, bq_ligand, blank_ligand, bq_fragment_list, blank_fragment_list):
     k, N, FileName, Mem, Cores, Functional, BasisSet, CorrSolvent = user_inputs
     counter = 1
 
     for combo in FragmentCombinations:
-            FragmentCharge = 0 
-            LigandCharge = 0    
-            FragmentMultiplicity = 1
-            LigandMultiplicity = 1
-            TotalCharge = FragmentCharge + LigandCharge
-            TotalMultiplicity = max(FragmentMultiplicity, LigandMultiplicity)
-            
-            BaseHeader = [
-                f"%chk={counter}-New.chk\n",
-                f"%mem={Mem}GB\n",
-                f"%nprocshared={Cores}\n",
-                f"#{Functional} {BasisSet} {CorrSolvent}\n",
-                "\n",
-                "MSc Project Code\n",
-                "\n"
-            ]
+        OutputFile = f"output_{counter}.txt"  # Define OutputFile name
 
-            TotalHeader = BaseHeader + [f"{TotalCharge} {TotalMultiplicity}\n"]
+        FragmentCharge = 0
+        LigandCharge = 0
+        FragmentMultiplicity = 1
+        LigandMultiplicity = 1
+        TotalCharge = FragmentCharge + LigandCharge
+        TotalMultiplicity = max(FragmentMultiplicity, LigandMultiplicity)
 
-            LigandHeader = BaseHeader + [f"{LigandCharge} {LigandMultiplicity}\n"]
-            
-            FragmentHeader = BaseHeader + [f"{FragmentCharge} {FragmentMultiplicity}\n"] 
+        BaseHeader = [
+            f"%chk={counter}-New.chk\n",
+            f"%mem={Mem}GB\n",
+            f"%nprocshared={Cores}\n",
+            f"#{Functional} {BasisSet} {CorrSolvent}\n",
+            "\n",
+            "MSc Project Code\n",
+            "\n"
+        ]
+
+        TotalHeader = BaseHeader + [f"{TotalCharge} {TotalMultiplicity}\n"]
+        LigandHeader = BaseHeader + [f"{LigandCharge} {LigandMultiplicity}\n"]
+        FragmentHeader = BaseHeader + [f"{FragmentCharge} {FragmentMultiplicity}\n"]
 
         with open(OutputFile, 'w') as outputfile:
             w = outputfile.write
             if N == 3:
                 w("".join(TotalHeader + blank_ligand + [fragment for i in combo for fragment in blank_fragment_list[i]]) + "\n")
                 w("".join(LigandHeader + [bq_fragment_list[combo[0] - 1]] + [fragment for i in combo[1:] for fragment in blank_fragment_list[i]]) + "\n")
-                # Repeat similar logic for other cases as needed
+                # Add logic for other cases if needed
             elif N == 2:
                 w("".join(TotalHeader + blank_ligand + [fragment for i in combo for fragment in blank_fragment_list[i]]) + "\n")
                 w("".join(LigandHeader + [bq_fragment_list[combo[0] - 1]] + [blank_fragment_list[combo[1] - 1]]) + "\n")
-                # Repeat similar logic for other cases as needed
+                # Add logic for other cases if needed
             elif N == 1:
                 w("".join(TotalHeader + blank_ligand + [fragment for i in combo for fragment in blank_fragment_list[i]]) + "\n")
                 w("".join(FragmentHeader + bq_ligand + [fragment for i in combo for fragment in blank_fragment_list[i]]) + "\n")
@@ -110,23 +113,23 @@ def Headers(FragmentCombinations, ligand, user_inputs, bq_ligand, blank_ligand, 
         }
 
         has_ala = any(coord in line for coord in coords_to_remove["ala_ser"] for line in lines)
-        has_ser = any(coord in line for coord in coords_to_remove["ser_val"] for line in lines)
+        has_ser = any(coord in line for coord in coords_to_remove["ala_ser"] for line in lines) or \
+                  any(coord in line for coord in coords_to_remove["ser_val"] for line in lines)
         has_val = any(coord in line for coord in coords_to_remove["ser_val"] for line in lines)
         has_his = any(coord in line for coord in coords_to_remove["his_gly3"] for line in lines)
         has_gly3 = any(coord in line for coord in coords_to_remove["his_gly3"] for line in lines)
 
         if has_ala and has_ser:
-            lines = [line for line in lines if not any(coord in line for coord in coords_to_remove["ala_ser"])]
+            lines = RemoveCoordinates(lines, coords_to_remove["ala_ser"])
         if has_ser and has_val:
-            lines = [line for line in lines if not any(coord in line for coord in coords_to_remove["ser_val"])]
+            lines = RemoveCoordinates(lines, coords_to_remove["ser_val"])
         if has_his and has_gly3:
-            lines = [line for line in lines if not any(coord in line for coord in coords_to_remove["his_gly3"])]
+            lines = RemoveCoordinates(lines, coords_to_remove["his_gly3"])
 
         with open(OutputFile, "w") as outfile:
             outfile.writelines(lines)
 
         counter += 1
-
 
 # Main execution
 user_inputs = UserInputs()
