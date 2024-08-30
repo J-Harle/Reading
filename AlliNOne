@@ -1,0 +1,118 @@
+from collections import defaultdict
+import itertools
+
+def user_inputs():
+    k = 14
+    N = int(input("How many amino acids would you like to include in the interaction?: "))
+    UnCorrFileName = input("Which file would you like to open? (Do not include .com): ")
+    FileName = UnCorrFileName + ".com"
+    Mem = str(int(input("How much memory would you like to use (In GB)?: ")))
+    Cores = str(int(input("How many cores would you like to use?: ")))
+    Functional = input("Which functional would you like to use?: ")
+    BasisSet = input("Which basis set would you like to use?: ")
+    Solvent = input("Which solvent would you like to use? If none, leave blank: ")
+    CorrSolvent = None
+    if Solvent and Solvent.lower() != "none":
+        CorrSolvent = f"SCRF=(Solvent={Solvent})"
+    OtherInput = input("Would you like any other commands in the command line? If none, leave blank: ")
+    return N, FileName, Mem, Cores, Functional, BasisSet, CorrSolvent, OtherInput
+
+def reading_file(FileName, k):
+    ligand = []
+    fragment_list = defaultdict(list)
+
+    with open(FileName, 'r') as file:
+        for line in file:
+            if "(Fragment=1)" in line:
+                ligand.append(line)
+            for i in range(3, 0, -1):  # Changed range to iterate correctly
+                fragment = "Fragment=" + str(i)
+                if fragment in line:
+                    fragment_list[i - 1].append(line)
+
+    alpha_carbons = {
+        "C     0   -6.16731500   -1.00122300   -5.55078900 L": "Gly",
+        "C     0  -10.72451300   -2.37171300   -1.74666900 L": "Thr",
+        "C     0   -8.53063600    1.37360000   -5.27666900 L": "Ala",
+        "C    0   -1.51049800   -5.38618600    1.41090200 L": "Val",
+        "C    0   -4.93146600   -6.47255500    0.16402800 L": "Ser",
+        "C     0   -1.73113300    7.70030600   -1.27190700 L": "Phe",
+        "C     0   -6.17476800    4.70639800   -2.24849100 L": "Val2",
+        "C     0   -9.94217300    2.86969300    2.23217500 L": "Trp",
+        "C    0    4.52841600   -4.76143000    1.68304500 L": "Gly2",
+        "C    0    5.06477900    0.58726100    6.48299200 L": "Ile",
+        "C    0    8.47649100    2.28203500   -2.41588500 L": "Tyr",
+        "C    0    4.90693600    4.74026800    3.18086700 L": "Cys",
+        "C     0   11.16489700   -2.34085000   -2.33665000 L": "His",
+        "C     0    9.96330700   -2.32906500    1.27171100 L": "Gly3",
+        "C                 -8.57988800   -5.52315400    0.73636700": "Ala",
+    }
+
+    # Create copies of ligand and fragment lists then line.replace
+    bq_ligand = [line.replace(f"(Fragment={i})", "-Bq") for i in range(1, k+3) for line in ligand]
+    blank_ligand = [line.replace(f"(Fragment={i})", " ") for i in range(1, k+3) for line in ligand]
+    
+    bq_fragment_list = {i: [line.replace(f"(Fragment={i+1})", "-Bq") for line in fragment_list[i]] for i in range(1, k+2)}
+    blank_fragment_list = {i: [line.replace(f"(Fragment={i+1})", " ") for line in fragment_list[i]] for i in range(1, k+2)}
+
+    return ligand, bq_ligand, blank_ligand, fragment_list, bq_fragment_list, blank_fragment_list
+
+def generate_combinations(fragments, K):
+    FragmentCombinations = itertools.combinations(fragments, K)
+    return FragmentCombinations
+
+def headers(FragmentCombinations, ligand, user_inputs, bq_ligand, blank_ligand, bq_fragment_list, blank_fragment_list):
+    N, FileName, Mem, Cores, Functional, BasisSet, CorrSolvent, OtherInput = user_inputs
+    counter = 1  
+    for combo in FragmentCombinations:
+        OutputFile = str(counter) + "-New.com"  
+        with open(OutputFile, "w") as outputfile: 
+            FragmentCharge = 0 
+            LigandCharge = 0    
+            FragmentMultiplicity = 1
+            LigandMultiplicity = 1
+            TotalCharge = FragmentCharge + LigandCharge
+            TotalMultiplicity = max(FragmentMultiplicity, LigandMultiplicity)
+            
+            BaseHeader = [
+                "%chk=" + str(counter) + "-New" + ".chk" + "\n",
+                "%mem=" + Mem + "GB" + "\n",
+                "%nprocshared=" + Cores + "\n",
+                "#" + " " + Functional +  " "+ BasisSet + " " + CorrSolvent + "\n",
+                "\n",
+                "MSc Project Code" + "\n",
+                "\n"
+            ]
+
+            TotalHeader = BaseHeader + [str(TotalCharge) + " " + str(TotalMultiplicity) + "\n"]
+
+            LigandHeader = BaseHeader + [str(LigandCharge) + " " + str(LigandMultiplicity) + "\n"]
+            
+            FragmentHeader = BaseHeader + [str(FragmentCharge) + " " + str(FragmentMultiplicity) + "\n"]
+
+            w = outputfile.writelines
+
+            outputfile.writelines(TotalHeader)
+            outputfile.writelines(blank_ligand)
+            for fragment in combo:
+                outputfile.writelines(blank_fragment_list[fragment - 1])
+            outputfile.write("\n--Link1--\n")
+            outputfile.writelines(FragmentHeader)
+            outputfile.writelines(bq_ligand)
+            for fragment in combo:
+                outputfile.writelines(bq_fragment_list[fragment - 1])
+            outputfile.write("\n--Link1--\n")
+            outputfile.writelines(LigandHeader)
+            outputfile.writelines(blank_ligand)
+            for fragment in combo:
+                outputfile.writelines(bq_fragment_list[fragment - 1])
+            outputfile.write("\n")
+        
+        counter += 1
+
+# Execution starts here
+user_inputs = user_inputs()
+N, FileName, Mem, Cores, Functional, BasisSet, CorrSolvent, OtherInput = user_inputs
+ligand, bq_ligand, blank_ligand, fragment_list, bq_fragment_list, blank_fragment_list = reading_file(FileName, N)
+FragmentCombinations = generate_combinations(fragment_list.keys(), N)
+headers(FragmentCombinations, ligand, user_inputs, bq_ligand, blank_ligand, bq_fragment_list, blank_fragment_list)
