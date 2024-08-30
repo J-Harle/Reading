@@ -27,22 +27,17 @@ def ReadingFile(FileName, k):
         for line in file:
             if "(Fragment=1)" in line:
                 ligand.append(line)
-            for i in range(3, k+3):  # k+3 as first fragment is ligand and there is no fragment 2
+            for i in range(3, k + 3):  # k + 3 because fragments start from 3 and index 1 is ligand
                 fragment = f"Fragment={i}"
                 if fragment in line:
                     fragment_list[i - 1].append(line)
 
-    # Create copies of ligand and fragment lists then line.replace
-    bq_ligand = ligand.copy()
-    blank_ligand = ligand.copy()
-    bq_fragment_list = {i: fragment_list[i].copy() for i in fragment_list}
-    blank_fragment_list = {i: fragment_list[i].copy() for i in fragment_list}
+    # Create modified versions of ligand and fragments
+    bq_ligand = [line.replace(f"(Fragment={i})", "-Bq") for i in range(1, k + 3) for line in ligand]
+    blank_ligand = [line.replace(f"(Fragment={i})", " ") for i in range(1, k + 3) for line in ligand]
     
-    for i in range(1, k+3):
-        bq_ligand = [line.replace(f"(Fragment={i})", "-Bq") for line in bq_ligand]
-        blank_ligand = [line.replace(f"(Fragment={i})", " ") for line in blank_ligand]
-        bq_fragment_list[i - 1] = [line.replace(f"(Fragment={i})", "-Bq") for line in bq_fragment_list[i - 1]]
-        blank_fragment_list[i - 1] = [line.replace(f"(Fragment={i})", " ") for line in blank_fragment_list[i - 1]]
+    bq_fragment_list = {i: [line.replace(f"(Fragment={i + 1})", "-Bq") for line in fragment_list[i]] for i in fragment_list}
+    blank_fragment_list = {i: [line.replace(f"(Fragment={i + 1})", " ") for line in fragment_list[i]] for i in fragment_list}
 
     return ligand, bq_ligand, blank_ligand, fragment_list, bq_fragment_list, blank_fragment_list
 
@@ -54,41 +49,49 @@ def Headers(FragmentCombinations, ligand, user_inputs, bq_ligand, blank_ligand, 
     counter = 1
 
     for combo in FragmentCombinations:
-        OutputFile = f"{counter}-New.com"  
+        OutputFile = f"{counter}-New.com"
 
         with open(OutputFile, 'w') as outputfile:
             w = outputfile.write
+            # Based on N, choose the appropriate output format
             if N == 3:
-                w(outputfile, TotalHeader, ''.join(blank_ligand), [fragment for i in combo for fragment in blank_fragment_list[i-1]])
-                w(outputfile, LigandHeader, ''.join(blank_ligand), [bq_fragment_list[combo[0] - 1]] + [fragment for i in combo[1:] for fragment in blank_fragment_list[i-1]])
-                w(outputfile, LigandHeader, ''.join(blank_ligand), [bq_fragment_list[combo[1] - 1]] + [fragment for i in combo[2:] for fragment in blank_fragment_list[i-1]])
-                w(outputfile, LigandHeader, ''.join(blank_ligand), [fragment for i in combo[:2] for fragment in blank_fragment_list[i-1]] + [bq_fragment_list[combo[2] - 1]])
-                w(outputfile, LigandHeader, ''.join(blank_ligand), [bq_fragment_list[combo[0] - 1]] + [bq_fragment_list[combo[1] - 1]] + [blank_fragment_list[combo[2] - 1]])
-                w(outputfile, LigandHeader, ''.join(blank_ligand), [bq_fragment_list[combo[0] - 1]] + [blank_fragment_list[combo[1] - 1]] + [bq_fragment_list[combo[2] - 1]])
-                w(outputfile, LigandHeader, ''.join(blank_ligand), [blank_fragment_list[combo[0] - 1]] + [bq_fragment_list[combo[1] - 1]] + [bq_fragment_list[combo[2] - 1]])
-                w(outputfile, LigandHeader, ''.join(blank_ligand), [bq_fragment_list[combo[0] - 1]] + [bq_fragment_list[combo[1] - 1]] + [bq_fragment_list[combo[2] - 1]])
-                w(outputfile, FragmentHeader, ''.join(bq_ligand), [fragment for i in combo for fragment in blank_fragment_list[i-1]])
-                w(outputfile, FragmentHeader, ''.join(bq_ligand), [bq_fragment_list[combo[0] - 1]] + [fragment for i in combo[1:] for fragment in blank_fragment_list[i-1]])
-                w(outputfile, FragmentHeader, ''.join(bq_ligand), [bq_fragment_list[combo[1] - 1]] + [fragment for i in combo[2:] for fragment in blank_fragment_list[i-1]])
-                w(outputfile, FragmentHeader, ''.join(bq_ligand), [fragment for i in combo[:2] for fragment in blank_fragment_list[i-1]] + [bq_fragment_list[combo[2] - 1]])
-                w(outputfile, FragmentHeader, ''.join(bq_ligand), [bq_fragment_list[combo[0] - 1]] + [bq_fragment_list[combo[1] - 1]] + [blank_fragment_list[combo[2] - 1]])
-                w(outputfile, FragmentHeader, ''.join(bq_ligand), [bq_fragment_list[combo[0] - 1]] + [blank_fragment_list[combo[1] - 1]] + [bq_fragment_list[combo[2] - 1]])
-                w(outputfile, FragmentHeader, ''.join(bq_ligand), [blank_fragment_list[combo[0] - 1]] + [bq_fragment_list[combo[1] - 1]] + [bq_fragment_list[combo[2] - 1]])
-
+                headers = [
+                    (TotalHeader, blank_ligand + [fragment for i in combo for fragment in blank_fragment_list[i]]),
+                    (LigandHeader, blank_ligand + [bq_fragment_list[combo[0] - 1]] + [fragment for i in combo[1:] for fragment in blank_fragment_list[i]]),
+                    (LigandHeader, blank_ligand + [bq_fragment_list[combo[1] - 1]] + [fragment for i in combo[2:] for fragment in blank_fragment_list[i]]),
+                    (LigandHeader, blank_ligand + [fragment for i in combo[:2] for fragment in blank_fragment_list[i]] + [bq_fragment_list[combo[2] - 1]]),
+                    (LigandHeader, blank_ligand + [bq_fragment_list[combo[0] - 1]] + [bq_fragment_list[combo[1] - 1]] + [blank_fragment_list[combo[2] - 1]]),
+                    (LigandHeader, blank_ligand + [bq_fragment_list[combo[0] - 1]] + [blank_fragment_list[combo[1] - 1]] + [bq_fragment_list[combo[2] - 1]]),
+                    (LigandHeader, blank_ligand + [blank_fragment_list[combo[0] - 1]] + [bq_fragment_list[combo[1] - 1]] + [bq_fragment_list[combo[2] - 1]]),
+                    (LigandHeader, blank_ligand + [bq_fragment_list[combo[0] - 1]] + [bq_fragment_list[combo[1] - 1]] + [bq_fragment_list[combo[2] - 1]]),
+                    (FragmentHeader, bq_ligand + [fragment for i in combo for fragment in blank_fragment_list[i]]),
+                    (FragmentHeader, bq_ligand + [bq_fragment_list[combo[0] - 1]] + [fragment for i in combo[1:] for fragment in blank_fragment_list[i]]),
+                    (FragmentHeader, bq_ligand + [bq_fragment_list[combo[1] - 1]] + [fragment for i in combo[2:] for fragment in blank_fragment_list[i]]),
+                    (FragmentHeader, bq_ligand + [fragment for i in combo[:2] for fragment in blank_fragment_list[i]] + [bq_fragment_list[combo[2] - 1]]),
+                    (FragmentHeader, bq_ligand + [bq_fragment_list[combo[0] - 1]] + [bq_fragment_list[combo[1] - 1]] + [blank_fragment_list[combo[2] - 1]]),
+                    (FragmentHeader, bq_ligand + [bq_fragment_list[combo[0] - 1]] + [blank_fragment_list[combo[1] - 1]] + [bq_fragment_list[combo[2] - 1]]),
+                    (FragmentHeader, bq_ligand + [blank_fragment_list[combo[0] - 1]] + [bq_fragment_list[combo[1] - 1]] + [bq_fragment_list[combo[2] - 1]])
+                ]
             elif N == 2:
-                w(outputfile, TotalHeader, ''.join(blank_ligand), [fragment for i in combo for fragment in blank_fragment_list[i-1]])
-                w(outputfile, LigandHeader, ''.join(blank_ligand), [bq_fragment_list[combo[0] - 1]] + [blank_fragment_list[combo[1] - 1]])
-                w(outputfile, LigandHeader, ''.join(blank_ligand), [blank_fragment_list[combo[0] - 1]] + [bq_fragment_list[combo[1] - 1]])
-                w(outputfile, LigandHeader, ''.join(blank_ligand), [bq_fragment_list[combo[0] - 1]] + [bq_fragment_list[combo[1] - 1]])
-                w(outputfile, FragmentHeader, ''.join(bq_ligand), [fragment for i in combo for fragment in blank_fragment_list[i-1]])
-                w(outputfile, FragmentHeader, ''.join(bq_ligand), [bq_fragment_list[combo[0] - 1]] + [blank_fragment_list[combo[1] - 1]])
-                w(outputfile, FragmentHeader, ''.join(bq_ligand), [blank_fragment_list[combo[0] - 1]] + [bq_fragment_list[combo[1] - 1]])
-
+                headers = [
+                    (TotalHeader, blank_ligand + [fragment for i in combo for fragment in blank_fragment_list[i]]),
+                    (LigandHeader, blank_ligand + [bq_fragment_list[combo[0] - 1]] + [blank_fragment_list[combo[1] - 1]]),
+                    (LigandHeader, blank_ligand + [blank_fragment_list[combo[0] - 1]] + [bq_fragment_list[combo[1] - 1]]),
+                    (LigandHeader, blank_ligand + [bq_fragment_list[combo[0] - 1]] + [bq_fragment_list[combo[1] - 1]]),
+                    (FragmentHeader, bq_ligand + [fragment for i in combo for fragment in blank_fragment_list[i]]),
+                    (FragmentHeader, bq_ligand + [bq_fragment_list[combo[0] - 1]] + [blank_fragment_list[combo[1] - 1]]),
+                    (FragmentHeader, bq_ligand + [blank_fragment_list[combo[0] - 1]] + [bq_fragment_list[combo[1] - 1]])
+                ]
             elif N == 1:
-                w(outputfile, TotalHeader, ''.join(blank_ligand), [fragment for i in combo for fragment in blank_fragment_list[i-1]])
-                w(outputfile, FragmentHeader, ''.join(bq_ligand), [fragment for i in combo for fragment in blank_fragment_list[i-1]])
-                w(outputfile, LigandHeader, ''.join(blank_ligand), [bq_fragment_list[i-1] for i in combo])
+                headers = [
+                    (TotalHeader, blank_ligand + [fragment for i in combo for fragment in blank_fragment_list[i]]),
+                    (FragmentHeader, bq_ligand + [fragment for i in combo for fragment in blank_fragment_list[i]]),
+                    (LigandHeader, blank_ligand + [bq_fragment_list[i - 1] for i in combo])
+                ]
 
+            for header, content in headers:
+                w(header)
+                w(''.join(content))
 
         # Check the generated file for specific amino acid pairs and remove coordinates if needed
         with open(OutputFile, "r") as infile:
@@ -100,21 +103,18 @@ def Headers(FragmentCombinations, ligand, user_inputs, bq_ligand, blank_ligand, 
             "his_gly3": ["HIS_GLY3_COORD1", "HIS_GLY3_COORD2"]
         }
 
-        has_ala = any(coords_to_remove["ala_ser"][0] in line for line in lines)
-        has_ser = any(coords_to_remove["ala_ser"][1] in line or coords_to_remove["ser_val"][0] in line for line in lines)
-        has_val = any(coords_to_remove["ser_val"][1] in line for line in lines)
-        has_his = any(coords_to_remove["his_gly3"][0] in line for line in lines)
-        has_gly3 = any(coords_to_remove["his_gly3"][1] in line for line in lines)
+        has_ala = any(coord in line for coord in coords_to_remove["ala_ser"] for line in lines)
+        has_ser = any(coord in line for coord in coords_to_remove["ser_val"] for line in lines)
+        has_val = any(coord in line for coord in coords_to_remove["ser_val"] for line in lines)
+        has_his = any(coord in line for coord in coords_to_remove["his_gly3"] for line in lines)
+        has_gly3 = any(coord in line for coord in coords_to_remove["his_gly3"] for line in lines)
 
         if has_ala and has_ser:
-            for coord in coords_to_remove["ala_ser"]:
-                lines = [line for line in lines if coord not in line]
+            lines = [line for line in lines if not any(coord in line for coord in coords_to_remove["ala_ser"])]
         if has_ser and has_val:
-            for coord in coords_to_remove["ser_val"]:
-                lines = [line for line in lines if coord not in line]
+            lines = [line for line in lines if not any(coord in line for coord in coords_to_remove["ser_val"])]
         if has_his and has_gly3:
-            for coord in coords_to_remove["his_gly3"]:
-                lines = [line for line in lines if coord not in line]
+            lines = [line for line in lines if not any(coord in line for coord in coords_to_remove["his_gly3"])]
 
         with open(OutputFile, "w") as outfile:
             outfile.writelines(lines)
