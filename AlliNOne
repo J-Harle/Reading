@@ -86,25 +86,26 @@ def headers(FragmentCombinations, ligand, user_inputs, bq_ligand, blank_ligand, 
                 "\n"
             ]
 
+            w=outputfile.writelines
             TotalHeader = BaseHeader + [str(TotalCharge) + " " + str(TotalMultiplicity) + "\n"]
             LigandHeader = BaseHeader + [str(LigandCharge) + " " + str(LigandMultiplicity) + "\n"]
             FragmentHeader = BaseHeader + [str(FragmentCharge) + " " + str(FragmentMultiplicity) + "\n"]
 
             # Write headers and data
-            outputfile.writelines(TotalHeader)
-            outputfile.writelines(blank_ligand)
+            w(TotalHeader)
+            w(blank_ligand)
             for fragment in combo:
-                outputfile.writelines(blank_fragment_list[fragment - 1])
+                w(blank_fragment_list[fragment - 1])
             outputfile.write("\n--Link1--\n")
-            outputfile.writelines(FragmentHeader)
-            outputfile.writelines(bq_ligand)
+            w(FragmentHeader)
+            w(bq_ligand)
             for fragment in combo:
-                outputfile.writelines(blank_fragment_list[fragment - 1])
+                w(blank_fragment_list[fragment - 1])
             outputfile.write("\n--Link1--\n")
-            outputfile.writelines(LigandHeader)
-            outputfile.writelines(blank_ligand)
+            w(LigandHeader)
+            w(blank_ligand)
             for fragment in combo:
-                outputfile.writelines(bq_fragment_list[fragment - 1])
+                w(bq_fragment_list[fragment - 1])
             outputfile.write("\n")
 
         # Now, check the generated file for specific amino acid pairs
