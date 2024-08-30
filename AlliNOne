@@ -25,7 +25,7 @@ def reading_file(FileName, k):
         for line in file:
             if "(Fragment=1)" in line:
                 ligand.append(line)
-            for i in range(3, 0, -1):  # Changed range to iterate correctly
+            for i in range(2, 14, 1): 
                 fragment = "Fragment=" + str(i)
                 if fragment in line:
                     fragment_list[i - 1].append(line)
