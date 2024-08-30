@@ -2,7 +2,7 @@ from collections import defaultdict
 import itertools
 
 def user_inputs():
-    k = 14
+    k = int(input("How many amino acids are in the structure? (ALDH=14): "))
     N = int(input("How many amino acids would you like to include in the interaction?: "))
     UnCorrFileName = input("Which file would you like to open? (Do not include .com): ")
     FileName = UnCorrFileName + ".com"
