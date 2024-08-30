@@ -51,11 +51,13 @@ def GenerateCombinations(Fragments, K):
 
 def Headers(FragmentCombinations, ligand, user_inputs, bq_ligand, blank_ligand, bq_fragment_list, blank_fragment_list):
     k, N, FileName, Mem, Cores, Functional, BasisSet, CorrSolvent = user_inputs
-    counter = 1  
-    w=outputfile.write
+    counter = 1
+
     for combo in FragmentCombinations:
         OutputFile = f"{counter}-New.com"  
 
+        with open(OutputFile, 'w') as outputfile:
+            w = outputfile.write
             if N == 3:
                 w(outputfile, TotalHeader, ''.join(blank_ligand), [fragment for i in combo for fragment in blank_fragment_list[i-1]])
                 w(outputfile, LigandHeader, ''.join(blank_ligand), [bq_fragment_list[combo[0] - 1]] + [fragment for i in combo[1:] for fragment in blank_fragment_list[i-1]])
