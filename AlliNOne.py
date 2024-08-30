@@ -97,11 +97,24 @@ def Headers(FragmentCombinations, ligand, user_inputs, bq_ligand, blank_ligand, 
         with open(OutputFile, "r") as infile:
             lines = infile.readlines()
 
-        coords_to_remove = {
-            "ala_ser": ["ALA_SER_COORD1", "ALA_SER_COORD2"],
-            "ser_val": ["SER_VAL_COORD1", "SER_VAL_COORD2"],
-            "his_gly3": ["HIS_GLY3_COORD1", "HIS_GLY3_COORD2"]
-        }
+    # Coordinates to remove if specific pairs are found
+    coords_to_remove = {
+        "ala_ser": [
+            "H    0   -6.55416120   -6.05342200    0.67196340 L",  # Ala coordinates
+            "O    0   -7.54013160   -5.79834050    0.49075190 L",    # Ser coordinates:
+            "H    0   -8.14204880   -5.89238440    1.23267610 L" 
+        ],
+        "ser_val": [
+            "H    0   -3.02666380   -6.78932410    0.80612210 L",  # Ser coordinates
+            "H    0   -4.03060530   -7.09699790    0.36810310 L",   # Val coordinates
+            "O    0   -3.99861870   -6.18252120    0.65846340 L"
+        ],
+        "his_gly3": [
+            "O     0   10.29649250   -2.41901770   -0.2378918 L",  # His coordinates:
+            "H     0   10.36614620   -1.71366010   0.88536300 L",  
+            "H     0    9.84058420   -2.7485774    -0.7157113 L"   # Gly3 coordinate
+        ],
+    }
 
         has_ala = any(coord in line for coord in coords_to_remove["ala_ser"] for line in lines)
         has_ser = any(coord in line for coord in coords_to_remove["ser_val"] for line in lines)
